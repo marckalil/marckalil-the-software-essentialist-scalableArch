@@ -10,7 +10,9 @@
   },
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "clean": "npm run clean --workspaces --if-present"
+    "clean": "npm run clean --workspaces --if-present",
+    "start:back": "npm run start:dev --workspace=@dddforum/backend",
+    "start:front": "npm run start:dev --workspace=@dddforum/frontend"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
