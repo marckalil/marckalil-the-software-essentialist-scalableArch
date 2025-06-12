@@ -18,7 +18,6 @@ const config: Config.InitialOptions = {
       tsconfig: "tsconfig.json",
     },
   },
-  setupFilesAfterEnv: ["<rootDir>/tests/.jestSetup.ts"],
   verbose: true,
   detectOpenHandles: true,
   forceExit: true,
