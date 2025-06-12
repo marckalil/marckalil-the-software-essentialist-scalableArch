@@ -7,12 +7,17 @@ import { sharedTestRoot } from "@dddforum/shared/src/paths";
 import { app } from "../../src/index";
 import { CreateUserInput } from "../../shared/user/types";
 import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
+import { databaseFixtures } from "../support/fixtures/databaseFixtures";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
 );
 
 defineFeature(feature, (test) => {
+  beforeEach(async () => {
+    await databaseFixtures.reset();
+  });
+
   test("Successful registration with marketing emails accepted", ({
     given,
     when,
@@ -26,6 +31,10 @@ defineFeature(feature, (test) => {
     given("I am a new user", () => {
       createUserInput = new CreateUserInputBuilder()
         .withAllRandomDetails()
+        .withEmail("x@y.com")
+        .withFirstName("John")
+        .withLastName("Doe")
+        .withUsername("johndoe")
         .build();
     });
     when(

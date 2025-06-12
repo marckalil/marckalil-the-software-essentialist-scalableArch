@@ -26,6 +26,7 @@ export class CreateUserInputBuilder {
       ...this.props,
       email,
     };
+    return this;
   }
 
   public withFirstName(firstName: string) {
