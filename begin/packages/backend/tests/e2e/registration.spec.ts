@@ -1,16 +1,12 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import path from "path";
 import request from "supertest";
-import { app } from "../../src/index";
 
 import { sharedTestRoot } from "@dddforum/shared/src/paths";
 
-type CreateUserInput = {
-  email: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-};
+import { app } from "../../src/index";
+import { CreateUserInput } from "../../shared/user/types";
+import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
@@ -27,7 +23,11 @@ defineFeature(feature, (test) => {
     let createUserResponse: any = {};
     let createUserInput: CreateUserInput;
 
-    given("I am a new user", () => {});
+    given("I am a new user", () => {
+      createUserInput = new CreateUserInputBuilder()
+        .withAllRandomDetails()
+        .build();
+    });
     when(
       "I register with valid account details accepting marketing emails",
       async () => {
@@ -41,8 +41,8 @@ defineFeature(feature, (test) => {
     );
     then("I should be granted access to my account", () => {
       expect(createUserResponse.status).toBe(201);
-      expect(createUserResponse.data).toBeDefined();
-      const { data } = createUserResponse;
+      expect(createUserResponse.body.data).toBeDefined();
+      const { data } = createUserResponse.body;
       expect(data).toHaveProperty("id");
       expect(data).toHaveProperty("email", createUserInput.email);
       expect(data).toHaveProperty("firstName", createUserInput.firstName);
