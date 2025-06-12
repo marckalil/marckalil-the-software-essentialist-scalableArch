@@ -1,7 +1,16 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import path from "path";
+import request from "supertest";
+import { app } from "../../src/index";
 
 import { sharedTestRoot } from "@dddforum/shared/src/paths";
+
+type CreateUserInput = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+};
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
@@ -16,21 +25,29 @@ defineFeature(feature, (test) => {
   }) => {
     let addEmailToMarketingList: any = {};
     let createUserResponse: any = {};
-    let userInfo: any = {};
+    let createUserInput: CreateUserInput;
+
     given("I am a new user", () => {});
     when(
       "I register with valid account details accepting marketing emails",
-      () => {}
+      async () => {
+        createUserResponse = await request(app)
+          .post("/users/new")
+          .send(createUserInput);
+        addEmailToMarketingList = await request(app)
+          .post("/marketing/new")
+          .send({ email: createUserInput.email });
+      }
     );
     then("I should be granted access to my account", () => {
       expect(createUserResponse.status).toBe(201);
       expect(createUserResponse.data).toBeDefined();
       const { data } = createUserResponse;
       expect(data).toHaveProperty("id");
-      expect(data).toHaveProperty("email", userInfo.email);
-      expect(data).toHaveProperty("firstName", userInfo.firstName);
-      expect(data).toHaveProperty("lastName", userInfo.lastName);
-      expect(data).toHaveProperty("username", userInfo.username);
+      expect(data).toHaveProperty("email", createUserInput.email);
+      expect(data).toHaveProperty("firstName", createUserInput.firstName);
+      expect(data).toHaveProperty("lastName", createUserInput.lastName);
+      expect(data).toHaveProperty("username", createUserInput.username);
     });
     and("I should expect to receive marketing emails", () => {
       expect(addEmailToMarketingList.status).toBe(201);
