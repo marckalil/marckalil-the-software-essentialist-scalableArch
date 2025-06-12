@@ -7,16 +7,16 @@ const config: Config.InitialOptions = {
   rootDir: "./",
   testMatch: ["**/tests/e2e/*.spec.ts"],
   transform: {
-    "^.+\\.(t|j)s$": "ts-jest",
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        tsconfig: "tsconfig.json",
+      },
+    ],
   },
   moduleFileExtensions: ["ts", "js", "json"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
-  },
-  globals: {
-    "ts-jest": {
-      tsconfig: "tsconfig.json",
-    },
   },
   verbose: true,
   detectOpenHandles: true,
