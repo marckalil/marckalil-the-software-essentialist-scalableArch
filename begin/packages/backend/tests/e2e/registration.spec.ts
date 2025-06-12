@@ -41,8 +41,10 @@ defineFeature(feature, (test) => {
     );
     then("I should be granted access to my account", () => {
       expect(createUserResponse.status).toBe(201);
-      expect(createUserResponse.body.data).toBeDefined();
-      const { data } = createUserResponse.body;
+      const { data, error, success } = createUserResponse.body;
+      expect(success).toBeTruthy();
+      expect(error).toBeUndefined();
+      expect(data).toBeDefined();
       expect(data).toHaveProperty("id");
       expect(data).toHaveProperty("email", createUserInput.email);
       expect(data).toHaveProperty("firstName", createUserInput.firstName);
