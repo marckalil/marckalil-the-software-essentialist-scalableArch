@@ -1,5 +1,5 @@
 import type { CreateUserInput } from "@dddforum/shared/src/api/users";
-import { TextUtils } from "../../../shared/utils/TextUtils";
+import { TextUtils } from "@dddforum/shared/src/utils/TextUtils";
 
 export class CreateUserInputBuilder {
   props: CreateUserInput;
