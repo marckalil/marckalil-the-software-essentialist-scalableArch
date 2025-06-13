@@ -1,6 +1,10 @@
 import express, { Request, Response } from "express";
 import { prisma } from "./database";
 import { User } from "@prisma/client";
+import { MarketingController } from "./modules/marketing";
+import { MarketingService } from "./modules/marketing/marketingService";
+import { ContactListAPI } from "./modules/marketing/contactListApi";
+import { marketingErrorHandler } from "./modules/marketing/marketingErrors";
 const cors = require("cors");
 const app = express();
 app.use(express.json());
@@ -52,13 +56,11 @@ app.post("/users/new", async (req: Request, res: Response) => {
     ]);
 
     if (keyIsMissing) {
-      return res
-        .status(400)
-        .json({
-          error: Errors.ValidationError,
-          data: undefined,
-          success: false,
-        });
+      return res.status(400).json({
+        error: Errors.ValidationError,
+        data: undefined,
+        success: false,
+      });
     }
 
     const userData = req.body;
@@ -67,26 +69,22 @@ app.post("/users/new", async (req: Request, res: Response) => {
       where: { email: req.body.email },
     });
     if (existingUserByEmail) {
-      return res
-        .status(409)
-        .json({
-          error: Errors.EmailAlreadyInUse,
-          data: undefined,
-          success: false,
-        });
+      return res.status(409).json({
+        error: Errors.EmailAlreadyInUse,
+        data: undefined,
+        success: false,
+      });
     }
 
     const existingUserByUsername = await prisma.user.findFirst({
       where: { username: req.body.username as string },
     });
     if (existingUserByUsername) {
-      return res
-        .status(409)
-        .json({
-          error: Errors.UsernameAlreadyTaken,
-          data: undefined,
-          success: false,
-        });
+      return res.status(409).json({
+        error: Errors.UsernameAlreadyTaken,
+        data: undefined,
+        success: false,
+      });
     }
 
     const { user, member } = await prisma.$transaction(async (tx) => {
@@ -97,13 +95,11 @@ app.post("/users/new", async (req: Request, res: Response) => {
       return { user, member };
     });
 
-    return res
-      .status(201)
-      .json({
-        error: undefined,
-        data: parseUserForResponse(user),
-        success: true,
-      });
+    return res.status(201).json({
+      error: undefined,
+      data: parseUserForResponse(user),
+      success: true,
+    });
   } catch (error) {
     console.log(error);
     // Return a failure error response
@@ -118,13 +114,11 @@ app.get("/users", async (req: Request, res: Response) => {
   try {
     const email = req.query.email as string;
     if (email === undefined) {
-      return res
-        .status(400)
-        .json({
-          error: Errors.ValidationError,
-          data: undefined,
-          success: false,
-        });
+      return res.status(400).json({
+        error: Errors.ValidationError,
+        data: undefined,
+        success: false,
+      });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
@@ -134,13 +128,11 @@ app.get("/users", async (req: Request, res: Response) => {
         .json({ error: Errors.UserNotFound, data: undefined, success: false });
     }
 
-    return res
-      .status(200)
-      .json({
-        error: undefined,
-        data: parseUserForResponse(user),
-        succes: true,
-      });
+    return res.status(200).json({
+      error: undefined,
+      data: parseUserForResponse(user),
+      succes: true,
+    });
   } catch (error) {
     return res
       .status(500)
@@ -186,6 +178,14 @@ app.get("/posts", async (req: Request, res: Response) => {
   }
 });
 const port = process.env.PORT || 3000;
+
+const contactListAPI = new ContactListAPI();
+const marketingService = new MarketingService(contactListAPI);
+const marketingController = new MarketingController(
+  marketingService,
+  marketingErrorHandler
+);
+app.use("/marketing", marketingController.getRouter());
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
