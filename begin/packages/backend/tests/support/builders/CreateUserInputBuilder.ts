@@ -1,4 +1,4 @@
-import type { CreateUserInput } from "../../../shared/user/types";
+import type { CreateUserInput } from "@dddforum/shared/src/api/users";
 import { TextUtils } from "../../../shared/utils/TextUtils";
 
 export class CreateUserInputBuilder {

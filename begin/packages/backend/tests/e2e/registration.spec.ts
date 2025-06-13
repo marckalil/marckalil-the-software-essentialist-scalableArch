@@ -2,10 +2,10 @@ import { defineFeature, loadFeature } from "jest-cucumber";
 import path from "path";
 import request from "supertest";
 
+import type { CreateUserInput } from "@dddforum/shared/src/api/users";
 import { sharedTestRoot } from "@dddforum/shared/src/paths";
 
 import { app } from "../../src/index";
-import { CreateUserInput } from "../../shared/user/types";
 import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
 import { databaseFixtures } from "../support/fixtures/databaseFixtures";
 
