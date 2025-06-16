@@ -8,6 +8,7 @@ import { sharedTestRoot } from "@dddforum/shared/src/paths";
 import { app } from "../../src/index";
 import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
 import { databaseFixtures } from "../support/fixtures/databaseFixtures";
+import { create } from "domain";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
@@ -137,19 +138,42 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test.skip("Account already created with email", ({
-    given,
-    when,
-    then,
-    and,
-  }) => {
-    given("a set of users already created accounts", (table) => {});
-    when("new users attempt to register with those emails", () => {});
+  test("Account already created with email", ({ given, when, then, and }) => {
+    let existingUsers: CreateUserInput[] = [];
+    let createUserResponses: any[] = [];
+    given("a set of users already created accounts", async (table) => {
+      existingUsers = table.map((row: any) =>
+        new CreateUserInputBuilder()
+          .withAllRandomDetails()
+          .withEmail(row.email)
+          .withFirstName(row.firstName)
+          .withLastName(row.lastName)
+          .build()
+      );
+      await databaseFixtures.setUpWithExistingUsers(existingUsers);
+    });
+    when("new users attempt to register with those emails", async () => {
+      createUserResponses = await Promise.all(
+        existingUsers.map((input) =>
+          request(app).post("/users/new").send(input)
+        )
+      );
+    });
     then(
       "they should see an error notifying them that the account already exists",
-      () => {}
+      () => {
+        for (const response of createUserResponses) {
+          expect(response.status).toBe(409);
+          expect(response.body).toHaveProperty("success", false);
+          expect(response.body).toHaveProperty("error", "EmailAlreadyInUse");
+        }
+      }
     );
-    and("they should not have been sent access to account details", () => {});
+    and("they should not have been sent access to account details", () => {
+      for (const response of createUserResponses) {
+        expect(response.body).not.toHaveProperty("data");
+      }
+    });
   });
 
   test.skip("Username already taken", ({ given, when, then, and }) => {

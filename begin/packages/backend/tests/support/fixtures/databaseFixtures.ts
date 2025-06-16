@@ -1,3 +1,4 @@
+import { CreateUserInput } from "@dddforum/shared/src/api/users";
 import { prisma } from "../../../src/database";
 
 async function reset() {
@@ -21,6 +22,26 @@ async function reset() {
   }
 }
 
+async function setUpWithExistingUsers(existingUsers: CreateUserInput[]) {
+  try {
+    for (const user of existingUsers) {
+      await prisma.user.create({
+        data: {
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          password: "dummyPassword",
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error setting up existing users:", error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
 export const databaseFixtures = {
   reset,
+  setUpWithExistingUsers,
 };
