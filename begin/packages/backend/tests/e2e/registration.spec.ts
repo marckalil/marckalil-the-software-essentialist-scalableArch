@@ -176,19 +176,52 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test.skip("Username already taken", ({ given, when, then, and }) => {
+  test("Username already taken", ({ given, when, then, and }) => {
+    let newUsers: CreateUserInput[] = [];
+    let createUserResponses: any[] = [];
     given(
       "a set of users have already created their accounts with valid details",
-      (table) => {}
+      async (table) => {
+        const existingUsers = table.map((row: any) =>
+          new CreateUserInputBuilder()
+            .withAllRandomDetails()
+            .withEmail(row.email)
+            .withFirstName(row.firstName)
+            .withLastName(row.lastName)
+            .withUsername(row.firstName + row.lastName)
+            .build()
+        );
+        await databaseFixtures.setUpWithExistingUsers(existingUsers);
+        newUsers = existingUsers.map((user: CreateUserInput) => {
+          return new CreateUserInputBuilder()
+            .withAllRandomDetails()
+            .withUsername(user.username)
+            .build();
+        });
+      }
     );
     when(
       "new users attempt to register with already taken usernames",
-      (table) => {}
+      async () => {
+        createUserResponses = await Promise.all(
+          newUsers.map((input) => request(app).post("/users/new").send(input))
+        );
+      }
     );
     then(
       "they see an error notifying them that the username has already been taken",
-      () => {}
+      () => {
+        for (const response of createUserResponses) {
+          expect(response.status).toBe(409);
+          expect(response.body).toHaveProperty("success", false);
+          expect(response.body).toHaveProperty("error", "UserNameAlreadyTaken");
+        }
+      }
     );
-    and("they should not have been sent access to account details", () => {});
+    and("they should not have been sent access to account details", () => {
+      for (const response of createUserResponses) {
+        expect(response.body).not.toHaveProperty("data");
+      }
+    });
   });
 });
