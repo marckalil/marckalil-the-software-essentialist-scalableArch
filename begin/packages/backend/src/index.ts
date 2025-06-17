@@ -13,6 +13,7 @@ import { userErrorHandler } from "./modules/users/usersError";
 import { UsersController } from "./modules/users/usersController";
 import { UsersService } from "./modules/users/usersService";
 import { PrismaClient } from "@prisma/client";
+import { TransactionalEmailAPI } from "./modules/notifications/transactionalEmailAPI";
 
 const app = express();
 app.use(express.json());
@@ -22,7 +23,8 @@ export const prisma = new PrismaClient();
 const database = new Database(prisma);
 
 // USERS
-const usersService = new UsersService(database);
+const transactionalEmailAPI = new TransactionalEmailAPI();
+const usersService = new UsersService(database, transactionalEmailAPI);
 const usersController = new UsersController(usersService, userErrorHandler);
 app.use("/users", usersController.getRouter());
 
