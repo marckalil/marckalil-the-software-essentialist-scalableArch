@@ -1,24 +1,25 @@
-import express, { Request, Response } from "express";
-import { Database, prisma } from "./database";
-import { User } from "@prisma/client";
-import { MarketingController } from "./modules/marketing";
-import { MarketingService } from "./modules/marketing/marketingService";
-import { ContactListAPI } from "./modules/marketing/contactListApi";
-import { marketingErrorHandler } from "./modules/marketing/marketingErrors";
-import { UsersController } from "./modules/users/usersController";
+import express from "express";
 const cors = require("cors");
 
-import { Errors } from "./shared/errors";
-import { UsersService } from "./modules/users/usersService";
-import { userErrorHandler } from "./modules/users/usersError";
+import { ContactListAPI } from "./modules/marketing/contactListApi";
+import { Database } from "./database";
+import { MarketingController } from "./modules/marketing";
+import { marketingErrorHandler } from "./modules/marketing/marketingErrors";
+import { MarketingService } from "./modules/marketing/marketingService";
 import { PostsController } from "./modules/posts/postsController";
 import { postsErrorHandler } from "./modules/posts/postsError";
+import { PostsService } from "./modules/posts/postsService";
+import { userErrorHandler } from "./modules/users/usersError";
+import { UsersController } from "./modules/users/usersController";
+import { UsersService } from "./modules/users/usersService";
+import { PrismaClient } from "@prisma/client";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const database = new Database();
+export const prisma = new PrismaClient();
+const database = new Database(prisma);
 
 // USERS
 const usersService = new UsersService(database);
@@ -35,17 +36,13 @@ const marketingController = new MarketingController(
 app.use("/marketing", marketingController.getRouter());
 
 // POSTS
-const postsController = new PostsController(postsErrorHandler);
+const postsService = new PostsService(database);
+const postsController = new PostsController(postsService, postsErrorHandler);
 app.use("/posts", postsController.getRouter());
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-prisma.post
-  .findMany({})
-  .then((posts) => console.log(posts))
-  .catch((err) => console.log(err));
 
 export { app };

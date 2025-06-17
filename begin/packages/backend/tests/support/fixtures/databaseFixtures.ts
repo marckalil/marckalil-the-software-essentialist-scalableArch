@@ -1,5 +1,6 @@
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
-import { prisma } from "../../../src/database";
+
+import { prisma } from "../../../src";
 
 async function reset() {
   const deleteAllComments = prisma.comment.deleteMany();
