@@ -14,6 +14,7 @@ import { UsersController } from "./modules/users/usersController";
 import { UsersService } from "./modules/users/usersService";
 import { PrismaClient } from "@prisma/client";
 import { TransactionalEmailAPI } from "./modules/notifications/transactionalEmailAPI";
+import { Server } from "./server";
 
 const app = express();
 app.use(express.json());
@@ -42,6 +43,11 @@ const postsService = new PostsService(database);
 const postsController = new PostsController(postsService, postsErrorHandler);
 app.use("/posts", postsController.getRouter());
 
+const server = new Server(
+  usersController,
+  marketingController,
+  postsController
+);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
