@@ -218,7 +218,7 @@ defineFeature(feature, (test) => {
         for (const response of createUserResponses) {
           expect(response.status).toBe(409);
           expect(response.body).toHaveProperty("success", false);
-          expect(response.body).toHaveProperty("error", "UserNameAlreadyTaken");
+          expect(response.body).toHaveProperty("error", "UsernameAlreadyTaken");
         }
       }
     );

@@ -4,3 +4,18 @@ export type CreateUserInput = {
   lastName: string;
   username: string;
 };
+
+import { APIResponse, GenericErrors } from ".";
+
+export type EmailAlreadyInUseError = "EmailAlreadyInUse";
+export type UsernameAlreadyTakenError = "UsernameAlreadyTaken";
+export type CreateUserErrors =
+  | GenericErrors
+  | EmailAlreadyInUseError
+  | UsernameAlreadyTakenError;
+export type CreateUserResponse = APIResponse<boolean, CreateUserErrors>;
+
+export type UsersResponse = APIResponse<
+  CreateUserResponse | null,
+  CreateUserErrors
+>;

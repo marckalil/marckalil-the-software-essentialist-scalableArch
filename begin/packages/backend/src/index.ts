@@ -9,6 +9,8 @@ import { UsersController } from "./modules/users/usersController";
 const cors = require("cors");
 
 import { Errors } from "./shared/errors";
+import { UsersService } from "./modules/users/usersService";
+import { userErrorHandler } from "./modules/users/usersError";
 
 const app = express();
 app.use(express.json());
@@ -60,7 +62,8 @@ const marketingController = new MarketingController(
   marketingErrorHandler
 );
 
-const usersController = new UsersController();
+const usersService = new UsersService();
+const usersController = new UsersController(usersService, userErrorHandler);
 
 app.use("/users", usersController.getRouter());
 app.use("/marketing", marketingController.getRouter());

@@ -1,99 +1,39 @@
-import express from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { prisma } from "../../database";
-import { User } from "@prisma/client";
-import { Errors } from "../../shared/errors";
+import { ErrorHandler, Errors } from "../../shared/errors";
+import { CreateUserDTO } from "./createUserDTO";
+import { UsersService } from "./usersService";
+import { parseUserForResponse } from "../../shared/utils";
+import { ValidationErrorException } from "../../shared/exceptions";
 
-function isMissingKeys(data: any, keysToCheckFor: string[]) {
-  for (let key of keysToCheckFor) {
-    if (data[key] === undefined) return true;
-  }
-  return false;
-}
-
-function generateRandomPassword(length: number): string {
-  const charset =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
-  const passwordArray = [];
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    passwordArray.push(charset[randomIndex]);
-  }
-
-  return passwordArray.join("");
-}
-
-function parseUserForResponse(user: User) {
-  const returnData = JSON.parse(JSON.stringify(user));
-  delete returnData.password;
-  return returnData;
-}
 export class UsersController {
-  private readonly router: express.Router;
-  constructor() {
-    this.router = express.Router();
+  private readonly router: Router;
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly errorHandler: ErrorHandler
+  ) {
+    this.router = Router();
     this.setupRoutes();
+    this.setupErrorHandler();
+  }
+
+  private setupErrorHandler() {
+    this.router.use(this.errorHandler);
   }
 
   private setupRoutes() {
     this.router.post("/new", this.createUser.bind(this));
-    this.router.get("/", this.getUserByEmail.bind(this));
+    this.router.get("/:email", this.getUserByEmail.bind(this));
   }
 
-  public getRouter(): express.Router {
+  public getRouter(): Router {
     return this.router;
   }
 
-  private async createUser(req: express.Request, res: express.Response) {
+  private async createUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const keyIsMissing = isMissingKeys(req.body, [
-        "email",
-        "firstName",
-        "lastName",
-        "username",
-      ]);
-
-      if (keyIsMissing) {
-        return res.status(400).json({
-          error: Errors.ValidationError,
-          data: undefined,
-          success: false,
-        });
-      }
-
-      const userData = req.body;
-
-      const existingUserByEmail = await prisma.user.findFirst({
-        where: { email: req.body.email },
-      });
-      if (existingUserByEmail) {
-        return res.status(409).json({
-          error: Errors.EmailAlreadyInUse,
-          data: undefined,
-          success: false,
-        });
-      }
-
-      const existingUserByUsername = await prisma.user.findFirst({
-        where: { username: req.body.username as string },
-      });
-      if (existingUserByUsername) {
-        return res.status(409).json({
-          error: Errors.UsernameAlreadyTaken,
-          data: undefined,
-          success: false,
-        });
-      }
-
-      const { user, member } = await prisma.$transaction(async (tx) => {
-        const user = await prisma.user.create({
-          data: { ...userData, password: generateRandomPassword(10) },
-        });
-        const member = await prisma.member.create({
-          data: { userId: user.id },
-        });
-        return { user, member };
-      });
+      const userData = CreateUserDTO.fromRequest(req.body);
+      const { user, member } = await this.usersService.createUser(userData);
 
       return res.status(201).json({
         error: undefined,
@@ -101,33 +41,18 @@ export class UsersController {
         success: true,
       });
     } catch (error) {
-      console.log(error);
-      // Return a failure error response
-      return res
-        .status(500)
-        .json({ error: Errors.ServerError, data: undefined, success: false });
+      next(error);
     }
   }
 
-  private async getUserByEmail(req: express.Request, res: express.Response) {
+  private async getUserByEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const email = req.query.email as string;
-      if (email === undefined) {
-        return res.status(400).json({
-          error: Errors.ValidationError,
-          data: undefined,
-          success: false,
-        });
-      }
-
-      const user = await prisma.user.findUnique({ where: { email } });
-      if (!user) {
-        return res.status(404).json({
-          error: Errors.UserNotFound,
-          data: undefined,
-          success: false,
-        });
-      }
+      const user = await this.usersService.getUserByEmail(email);
 
       return res.status(200).json({
         error: undefined,
@@ -135,9 +60,7 @@ export class UsersController {
         success: true,
       });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ error: Errors.ServerError, data: undefined, success: false });
+      next(error);
     }
   }
 }

@@ -15,9 +15,33 @@ class InvalidRequestBodyException extends CustomException {
   }
 }
 
+export class ValidationErrorException extends CustomException {
+  constructor() {
+    super("An error occurred", "ValidationErrorException");
+  }
+}
+
 class ServerErrorException extends CustomException {
   constructor() {
     super("An error occurred", "ServerErrorException");
+  }
+}
+
+export class EmailAlreadyInUseException extends CustomException {
+  constructor() {
+    super("An error occurred", "EmailAlreadyInUseException");
+  }
+}
+
+export class UsernameAlreadyTakenException extends CustomException {
+  constructor() {
+    super("An error occurred", "UsernameAlreadyTakenException");
+  }
+}
+
+export class UserNotFoundException extends CustomException {
+  constructor() {
+    super("An error occurred", "UserNotFoundException");
   }
 }
 
