@@ -1,10 +1,8 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { prisma } from "../../database";
-import { ErrorHandler, Errors } from "../../shared/errors";
+import { ErrorHandler } from "../../shared/errors";
 import { CreateUserDTO } from "./createUserDTO";
 import { UsersService } from "./usersService";
 import { parseUserForResponse } from "../../shared/utils";
-import { ValidationErrorException } from "../../shared/exceptions";
 
 export class UsersController {
   private readonly router: Router;
