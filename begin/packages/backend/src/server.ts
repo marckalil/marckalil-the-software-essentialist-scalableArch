@@ -20,6 +20,10 @@ export class Server {
     this.registerRoutes();
   }
 
+  public getInstance(): Express {
+    return this._instance;
+  }
+
   private addMiddleware() {
     this._instance.use(express.json());
     this._instance.use(cors());

@@ -1,3 +1,4 @@
+import type { Express } from "express";
 import { defineFeature, loadFeature } from "jest-cucumber";
 import path from "path";
 import request from "supertest";
@@ -5,16 +6,22 @@ import request from "supertest";
 import type { CreateUserInput } from "@dddforum/shared/src/api/users";
 import { sharedTestRoot } from "@dddforum/shared/src/paths";
 
-import { app } from "../../src/index";
 import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
 import { databaseFixtures } from "../support/fixtures/databaseFixtures";
-import { create } from "domain";
+import { server } from "../../src/bootstrap";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
 );
 
 defineFeature(feature, (test) => {
+  let app: Express;
+
+  beforeAll(async () => {
+    await server.start(3000);
+    app = server.getInstance();
+  });
+
   beforeEach(async () => {
     await databaseFixtures.reset();
   });
