@@ -27,6 +27,12 @@ class ServerErrorException extends CustomException {
   }
 }
 
+export class ClientErrorException extends CustomException {
+  constructor() {
+    super("An error occurred", "ClientError");
+  }
+}
+
 export class EmailAlreadyInUseException extends CustomException {
   constructor() {
     super("An error occurred", "EmailAlreadyInUseException");

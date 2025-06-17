@@ -11,4 +11,5 @@ export type APIResponse<T, U> = {
 
 export type ValidationError = "ValidationError";
 export type ServerError = "ServerError";
-export type GenericErrors = ValidationError | ServerError;
+export type ClientError = "ClientError";
+export type GenericErrors = ValidationError | ServerError | ClientError;
