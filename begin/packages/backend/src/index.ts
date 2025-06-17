@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { prisma } from "./database";
+import { Database, prisma } from "./database";
 import { User } from "@prisma/client";
 import { MarketingController } from "./modules/marketing";
 import { MarketingService } from "./modules/marketing/marketingService";
@@ -55,6 +55,8 @@ app.get("/posts", async (req: Request, res: Response) => {
 });
 const port = process.env.PORT || 3000;
 
+const database = new Database();
+
 const contactListAPI = new ContactListAPI();
 const marketingService = new MarketingService(contactListAPI);
 const marketingController = new MarketingController(
@@ -62,7 +64,7 @@ const marketingController = new MarketingController(
   marketingErrorHandler
 );
 
-const usersService = new UsersService();
+const usersService = new UsersService(database);
 const usersController = new UsersController(usersService, userErrorHandler);
 
 app.use("/users", usersController.getRouter());

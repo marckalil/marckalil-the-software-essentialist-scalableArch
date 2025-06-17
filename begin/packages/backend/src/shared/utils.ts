@@ -19,9 +19,3 @@ export function generateRandomPassword(length: number): string {
 
   return passwordArray.join("");
 }
-
-export function parseUserForResponse(user: User) {
-  const returnData = JSON.parse(JSON.stringify(user));
-  delete returnData.password;
-  return returnData;
-}

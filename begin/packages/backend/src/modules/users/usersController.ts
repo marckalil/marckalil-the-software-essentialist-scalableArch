@@ -2,7 +2,6 @@ import { NextFunction, Request, Response, Router } from "express";
 import { ErrorHandler } from "../../shared/errors";
 import { CreateUserDTO } from "./createUserDTO";
 import { UsersService } from "./usersService";
-import { parseUserForResponse } from "../../shared/utils";
 
 export class UsersController {
   private readonly router: Router;
@@ -31,11 +30,10 @@ export class UsersController {
   private async createUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userData = CreateUserDTO.fromRequest(req.body);
-      const { user, member } = await this.usersService.createUser(userData);
-
+      const user = await this.usersService.createUser(userData);
       return res.status(201).json({
         error: undefined,
-        data: parseUserForResponse(user),
+        data: user,
         success: true,
       });
     } catch (error) {
@@ -54,7 +52,7 @@ export class UsersController {
 
       return res.status(200).json({
         error: undefined,
-        data: parseUserForResponse(user),
+        data: user,
         success: true,
       });
     } catch (error) {

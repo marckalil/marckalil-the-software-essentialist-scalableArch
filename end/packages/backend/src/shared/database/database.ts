@@ -103,8 +103,8 @@ export class Database {
           email: post.member.user.email,
           username: post.member.user.username,
           firstName: post.member.user.firstName,
-          lastName: post.member.user.lastName
-        }
+          lastName: post.member.user.lastName,
+        },
       },
       votes: post.votes,
       comments: post.comments,
