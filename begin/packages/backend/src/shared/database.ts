@@ -20,8 +20,8 @@ export class Database {
   public posts: PostsPersistence;
   private connection: PrismaClient;
 
-  constructor(prismaClient: PrismaClient) {
-    this.connection = prismaClient;
+  constructor() {
+    this.connection = new PrismaClient();
     this.users = this.buildUsersPersistence();
     this.posts = this.buildPostsPersistence();
   }

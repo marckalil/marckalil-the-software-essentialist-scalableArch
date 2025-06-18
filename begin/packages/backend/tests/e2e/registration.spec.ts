@@ -7,8 +7,9 @@ import type { CreateUserInput } from "@dddforum/shared/src/api/users";
 import { sharedTestRoot } from "@dddforum/shared/src/paths";
 
 import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
-import { databaseFixtures } from "../support/fixtures/databaseFixtures";
-import { server } from "../../src/shared/bootstrap";
+import { DatabaseFixtures } from "../support/fixtures/databaseFixtures";
+import { CompositionRootConfig } from "../../src/shared/config/compositionRootConfig";
+import { CompositionRoot } from "../../src/shared/compositionRoot";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
@@ -16,10 +17,17 @@ const feature = loadFeature(
 
 defineFeature(feature, (test) => {
   let app: Express;
+  let databaseFixtures: DatabaseFixtures;
 
   beforeAll(async () => {
-    await server.start(3000);
-    app = server.getInstance();
+    const compositionRootConfig = new CompositionRootConfig("test:e2e");
+    const compositionRoot = CompositionRoot.createCompositionRoot(
+      compositionRootConfig
+    );
+    const webServer = compositionRoot.getWebServer();
+    app = webServer.getInstance();
+    const databaseConnection = compositionRoot.getDatabaseConnection();
+    databaseFixtures = new DatabaseFixtures(databaseConnection.getConnection());
   });
 
   beforeEach(async () => {

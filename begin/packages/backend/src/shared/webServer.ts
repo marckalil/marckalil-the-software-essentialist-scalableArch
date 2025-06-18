@@ -7,15 +7,26 @@ import { PostsController } from "../modules/posts/postsController";
 
 const cors = require("cors");
 
-export class Server {
+export class WebServer {
   private _instance: Express;
+  private readonly port: number;
+  private readonly usersController: UsersController;
+  private readonly marketingController: MarketingController;
+  private readonly postsController: PostsController;
 
   constructor(
-    private readonly usersController: UsersController,
-    private readonly marketingController: MarketingController,
-    private readonly postsController: PostsController
+    { port }: { port: number },
+    controllers: {
+      usersController: UsersController;
+      marketingController: MarketingController;
+      postsController: PostsController;
+    }
   ) {
     this._instance = express();
+    this.port = port;
+    this.usersController = controllers.usersController;
+    this.marketingController = controllers.marketingController;
+    this.postsController = controllers.postsController;
     this.addMiddleware();
     this.registerRoutes();
   }
@@ -35,7 +46,8 @@ export class Server {
     this._instance.use("/posts", this.postsController.getRouter());
   }
 
-  public start(port: number) {
+  public start() {
+    const port = Number(process.env.PORT || this.port);
     const httpServer = this._instance.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
