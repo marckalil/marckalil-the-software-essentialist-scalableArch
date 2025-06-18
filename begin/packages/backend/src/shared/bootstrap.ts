@@ -3,20 +3,20 @@ import { Database } from "./database";
 
 import { Server } from "./server";
 
-import { ContactListAPI } from "./modules/marketing/contactListApi";
-import { MarketingController } from "./modules/marketing";
-import { marketingErrorHandler } from "./modules/marketing/marketingErrors";
-import { MarketingService } from "./modules/marketing/marketingService";
+import { ContactListAPI } from "../modules/marketing/contactListApi";
+import { MarketingController } from "../modules/marketing";
+import { marketingErrorHandler } from "../modules/marketing/marketingErrors";
+import { MarketingService } from "../modules/marketing/marketingService";
 
-import { PostsController } from "./modules/posts/postsController";
-import { postsErrorHandler } from "./modules/posts/postsError";
-import { PostsService } from "./modules/posts/postsService";
+import { PostsController } from "../modules/posts/postsController";
+import { postsErrorHandler } from "../modules/posts/postsError";
+import { PostsService } from "../modules/posts/postsService";
 
-import { TransactionalEmailAPI } from "./modules/notifications/transactionalEmailAPI";
+import { TransactionalEmailAPI } from "../modules/notifications/transactionalEmailAPI";
 
-import { userErrorHandler } from "./modules/users/usersError";
-import { UsersController } from "./modules/users/usersController";
-import { UsersService } from "./modules/users/usersService";
+import { userErrorHandler } from "../modules/users/usersError";
+import { UsersController } from "../modules/users/usersController";
+import { UsersService } from "../modules/users/usersService";
 
 // DATABASE
 export const prisma = new PrismaClient();

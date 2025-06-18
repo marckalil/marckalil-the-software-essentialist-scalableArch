@@ -8,7 +8,7 @@ import { sharedTestRoot } from "@dddforum/shared/src/paths";
 
 import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
 import { databaseFixtures } from "../support/fixtures/databaseFixtures";
-import { server } from "../../src/bootstrap";
+import { server } from "../../src/shared/bootstrap";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
