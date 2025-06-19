@@ -1,8 +1,5 @@
 import express, { Express } from "express";
 import { Server as HttpServer } from "http";
-
-import { UsersController } from "../../modules/users/usersController";
-
 const cors = require("cors");
 
 export class WebServer {
@@ -10,20 +7,12 @@ export class WebServer {
   private httpServer: HttpServer | undefined;
   private state: "started" | "stopped";
   private readonly port: number;
-  private readonly usersController: UsersController;
 
-  constructor(
-    { port }: { port: number },
-    controllers: {
-      usersController: UsersController;
-    }
-  ) {
+  constructor({ port }: { port: number }) {
     this.app = express();
     this.state = "stopped";
     this.port = port;
-    this.usersController = controllers.usersController;
     this.addMiddleware();
-    this.registerRoutes();
   }
 
   public getApplication(): Express {
@@ -33,10 +22,6 @@ export class WebServer {
   private addMiddleware() {
     this.app.use(express.json());
     this.app.use(cors());
-  }
-
-  private registerRoutes() {
-    this.app.use("/users", this.usersController.getRouter());
   }
 
   public mountRouter(path: string, router: express.Router): void {

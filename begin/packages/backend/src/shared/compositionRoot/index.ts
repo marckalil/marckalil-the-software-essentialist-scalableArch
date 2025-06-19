@@ -2,22 +2,19 @@ import { CompositionRootConfig } from "../config/compositionRootConfig";
 import { Database } from "../database";
 import { WebServer } from "../webServer";
 
-import { TransactionalEmailAPI } from "../../modules/notifications/transactionalEmailAPI";
-import { userErrorHandler } from "../../modules/users/usersError";
-import { UsersController } from "../../modules/users/usersController";
-import { UsersService } from "../../modules/users/usersService";
-
 import { MarketingModule } from "../../modules/marketing/marketingModule";
+import { NotificationsModule } from "../../modules/notifications/notificationsModule";
 import { PostsModule } from "../../modules/posts";
+import { UsersModule } from "../../modules/users";
 
 export class CompositionRoot {
   private static instance: CompositionRoot;
   private config: CompositionRootConfig;
   private databaseConnection: Database;
-  private transactionalEmailAPI: TransactionalEmailAPI;
-  private usersService: UsersService;
+  private readonly notificationsModule: NotificationsModule;
   private marketingModule: MarketingModule;
   private postsModule: PostsModule;
+  private usersModule: UsersModule;
   private webServer: WebServer;
 
   public static createCompositionRoot(
@@ -31,10 +28,10 @@ export class CompositionRoot {
   private constructor(config: CompositionRootConfig) {
     this.config = config;
     this.databaseConnection = this.createDatabaseConnection();
-    this.transactionalEmailAPI = this.createTransactionalEmailAPI();
-    this.usersService = this.createUsersService();
+    this.notificationsModule = this.createNotificationsModule();
     this.marketingModule = this.createMarketingModule();
     this.postsModule = this.createPostsModule();
+    this.usersModule = this.createUsersModule();
     this.webServer = this.createWebServer();
     this.mountRoutes();
   }
@@ -43,7 +40,6 @@ export class CompositionRoot {
   private createDatabaseConnection(): Database {
     return new Database();
   }
-
   public getDatabaseConnection(): Database {
     if (!this.databaseConnection) {
       this.databaseConnection = this.createDatabaseConnection();
@@ -52,60 +48,33 @@ export class CompositionRoot {
   }
 
   // MODULES
+  private createNotificationsModule(): NotificationsModule {
+    return NotificationsModule.build();
+  }
   private createMarketingModule(): MarketingModule {
     return MarketingModule.build();
   }
   private createPostsModule(): PostsModule {
     return PostsModule.build(this.getDatabaseConnection());
   }
-
-  // TRANSACTIONAL EMAIL API
-  private createTransactionalEmailAPI(): TransactionalEmailAPI {
-    return new TransactionalEmailAPI();
-  }
-  public getTransactionalEmailAPI(): TransactionalEmailAPI {
-    if (!this.transactionalEmailAPI)
-      this.transactionalEmailAPI = this.createTransactionalEmailAPI();
-    return this.transactionalEmailAPI;
-  }
-
-  // USERS SERVICE
-  private createUsersService(): UsersService {
-    return new UsersService(
+  private createUsersModule(): UsersModule {
+    return UsersModule.build(
       this.getDatabaseConnection(),
-      this.getTransactionalEmailAPI()
+      this.notificationsModule.getTransactionalEmailAPI()
     );
-  }
-  public getUsersService(): UsersService {
-    if (!this.usersService) this.usersService = this.createUsersService();
-    return this.usersService;
-  }
-
-  // CONTROLLERS
-  private createControllers(): {
-    usersController: UsersController;
-  } {
-    return {
-      usersController: new UsersController(
-        this.getUsersService(),
-        userErrorHandler
-      ),
-    };
   }
 
   // WEB SERVER
   private createWebServer(): WebServer {
-    const controllers = this.createControllers();
-    return new WebServer({ port: 3000 }, controllers);
+    return new WebServer({ port: 3000 });
   }
-
   public getWebServer(): WebServer {
     if (!this.webServer) this.webServer = this.createWebServer();
     return this.webServer;
   }
-
   private mountRoutes() {
     this.marketingModule.mountRouter(this.getWebServer());
     this.postsModule.mountRouter(this.getWebServer());
+    this.usersModule.mountRouter(this.getWebServer());
   }
 }
