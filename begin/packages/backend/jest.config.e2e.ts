@@ -5,7 +5,7 @@ const config: Config.InitialOptions = {
   preset: "ts-jest",
   testEnvironment: "node",
   rootDir: "./",
-  testMatch: ["**/tests/e2e/*.spec.ts"],
+  testMatch: ["**/tests/features/*.spec.ts"],
   transform: {
     "^.+\\.(t|j)s$": [
       "ts-jest",
