@@ -3,4 +3,8 @@ export class ContactListAPI {
     console.log("Adding email to contact list:", email);
     return true;
   }
+
+  public static build() {
+    return new ContactListAPI();
+  }
 }

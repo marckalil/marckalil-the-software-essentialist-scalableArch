@@ -2,16 +2,12 @@ import { CompositionRootConfig } from "../config/compositionRootConfig";
 import { Database } from "../database";
 import { WebServer } from "../webServer";
 
-import { ContactListAPI } from "../../modules/marketing/contactListApi";
-import { MarketingController } from "../../modules/marketing";
-import { marketingErrorHandler } from "../../modules/marketing/marketingErrors";
-import { MarketingService } from "../../modules/marketing/marketingService";
-
 import { TransactionalEmailAPI } from "../../modules/notifications/transactionalEmailAPI";
 import { userErrorHandler } from "../../modules/users/usersError";
 import { UsersController } from "../../modules/users/usersController";
 import { UsersService } from "../../modules/users/usersService";
 
+import { MarketingModule } from "../../modules/marketing/marketingModule";
 import { PostsModule } from "../../modules/posts";
 
 export class CompositionRoot {
@@ -20,8 +16,7 @@ export class CompositionRoot {
   private databaseConnection: Database;
   private transactionalEmailAPI: TransactionalEmailAPI;
   private usersService: UsersService;
-  private contactListAPI: ContactListAPI;
-  private marketingService: MarketingService;
+  private marketingModule: MarketingModule;
   private postsModule: PostsModule;
   private webServer: WebServer;
 
@@ -38,8 +33,7 @@ export class CompositionRoot {
     this.databaseConnection = this.createDatabaseConnection();
     this.transactionalEmailAPI = this.createTransactionalEmailAPI();
     this.usersService = this.createUsersService();
-    this.contactListAPI = this.createContactListAPI();
-    this.marketingService = this.createMarketingService();
+    this.marketingModule = this.createMarketingModule();
     this.postsModule = this.createPostsModule();
     this.webServer = this.createWebServer();
     this.mountRoutes();
@@ -58,6 +52,9 @@ export class CompositionRoot {
   }
 
   // MODULES
+  private createMarketingModule(): MarketingModule {
+    return MarketingModule.build();
+  }
   private createPostsModule(): PostsModule {
     return PostsModule.build(this.getDatabaseConnection());
   }
@@ -84,38 +81,14 @@ export class CompositionRoot {
     return this.usersService;
   }
 
-  // CONTACT LIST API
-  private createContactListAPI(): ContactListAPI {
-    return new ContactListAPI();
-  }
-  public getContactListAPI(): ContactListAPI {
-    if (!this.contactListAPI) this.contactListAPI = this.createContactListAPI();
-    return this.contactListAPI;
-  }
-
-  // MARKETING
-  private createMarketingService(): MarketingService {
-    return new MarketingService(this.getContactListAPI());
-  }
-  public getMarketingService(): MarketingService {
-    if (!this.marketingService)
-      this.marketingService = this.createMarketingService();
-    return this.marketingService;
-  }
-
   // CONTROLLERS
   private createControllers(): {
     usersController: UsersController;
-    marketingController: MarketingController;
   } {
     return {
       usersController: new UsersController(
         this.getUsersService(),
         userErrorHandler
-      ),
-      marketingController: new MarketingController(
-        this.getMarketingService(),
-        marketingErrorHandler
       ),
     };
   }
@@ -132,6 +105,7 @@ export class CompositionRoot {
   }
 
   private mountRoutes() {
+    this.marketingModule.mountRouter(this.getWebServer());
     this.postsModule.mountRouter(this.getWebServer());
   }
 }
