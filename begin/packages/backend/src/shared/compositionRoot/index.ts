@@ -7,14 +7,12 @@ import { MarketingController } from "../../modules/marketing";
 import { marketingErrorHandler } from "../../modules/marketing/marketingErrors";
 import { MarketingService } from "../../modules/marketing/marketingService";
 
-import { PostsController } from "../../modules/posts/postsController";
-import { postsErrorHandler } from "../../modules/posts/postsError";
-import { PostsService } from "../../modules/posts/postsService";
-
 import { TransactionalEmailAPI } from "../../modules/notifications/transactionalEmailAPI";
 import { userErrorHandler } from "../../modules/users/usersError";
 import { UsersController } from "../../modules/users/usersController";
 import { UsersService } from "../../modules/users/usersService";
+
+import { PostsModule } from "../../modules/posts";
 
 export class CompositionRoot {
   private static instance: CompositionRoot;
@@ -24,7 +22,7 @@ export class CompositionRoot {
   private usersService: UsersService;
   private contactListAPI: ContactListAPI;
   private marketingService: MarketingService;
-  private postsService: PostsService;
+  private postsModule: PostsModule;
   private webServer: WebServer;
 
   public static createCompositionRoot(
@@ -42,8 +40,9 @@ export class CompositionRoot {
     this.usersService = this.createUsersService();
     this.contactListAPI = this.createContactListAPI();
     this.marketingService = this.createMarketingService();
-    this.postsService = this.createPostsService();
+    this.postsModule = this.createPostsModule();
     this.webServer = this.createWebServer();
+    this.mountRoutes();
   }
 
   // DATABASE CONNECTION
@@ -56,6 +55,11 @@ export class CompositionRoot {
       this.databaseConnection = this.createDatabaseConnection();
     }
     return this.databaseConnection;
+  }
+
+  // MODULES
+  private createPostsModule(): PostsModule {
+    return PostsModule.build(this.getDatabaseConnection());
   }
 
   // TRANSACTIONAL EMAIL API
@@ -99,20 +103,10 @@ export class CompositionRoot {
     return this.marketingService;
   }
 
-  // POSTS SERVICE
-  private createPostsService(): PostsService {
-    return new PostsService(this.getDatabaseConnection());
-  }
-  public getPostsService(): PostsService {
-    if (!this.postsService) this.postsService = this.createPostsService();
-    return this.postsService;
-  }
-
   // CONTROLLERS
   private createControllers(): {
     usersController: UsersController;
     marketingController: MarketingController;
-    postsController: PostsController;
   } {
     return {
       usersController: new UsersController(
@@ -123,10 +117,6 @@ export class CompositionRoot {
         this.getMarketingService(),
         marketingErrorHandler
       ),
-      postsController: new PostsController(
-        this.getPostsService(),
-        postsErrorHandler
-      ),
     };
   }
 
@@ -135,8 +125,13 @@ export class CompositionRoot {
     const controllers = this.createControllers();
     return new WebServer({ port: 3000 }, controllers);
   }
+
   public getWebServer(): WebServer {
     if (!this.webServer) this.webServer = this.createWebServer();
     return this.webServer;
+  }
+
+  private mountRoutes() {
+    this.postsModule.mountRouter(this.getWebServer());
   }
 }

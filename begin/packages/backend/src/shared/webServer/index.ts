@@ -3,7 +3,6 @@ import { Server as HttpServer } from "http";
 
 import { UsersController } from "../../modules/users/usersController";
 import { MarketingController } from "../../modules/marketing";
-import { PostsController } from "../../modules/posts/postsController";
 
 const cors = require("cors");
 
@@ -14,14 +13,12 @@ export class WebServer {
   private readonly port: number;
   private readonly usersController: UsersController;
   private readonly marketingController: MarketingController;
-  private readonly postsController: PostsController;
 
   constructor(
     { port }: { port: number },
     controllers: {
       usersController: UsersController;
       marketingController: MarketingController;
-      postsController: PostsController;
     }
   ) {
     this.app = express();
@@ -29,7 +26,6 @@ export class WebServer {
     this.port = port;
     this.usersController = controllers.usersController;
     this.marketingController = controllers.marketingController;
-    this.postsController = controllers.postsController;
     this.addMiddleware();
     this.registerRoutes();
   }
@@ -46,7 +42,10 @@ export class WebServer {
   private registerRoutes() {
     this.app.use("/users", this.usersController.getRouter());
     this.app.use("/marketing", this.marketingController.getRouter());
-    this.app.use("/posts", this.postsController.getRouter());
+  }
+
+  public mountRouter(path: string, router: express.Router): void {
+    this.app.use(path, router);
   }
 
   public stop(): Promise<void> {
