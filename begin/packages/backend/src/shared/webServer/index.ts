@@ -1,9 +1,9 @@
 import express, { Express } from "express";
 import { Server as HttpServer } from "http";
 
-import { UsersController } from "../modules/users/usersController";
-import { MarketingController } from "../modules/marketing";
-import { PostsController } from "../modules/posts/postsController";
+import { UsersController } from "../../modules/users/usersController";
+import { MarketingController } from "../../modules/marketing";
+import { PostsController } from "../../modules/posts/postsController";
 
 const cors = require("cors");
 

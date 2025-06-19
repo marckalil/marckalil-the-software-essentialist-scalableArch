@@ -1,17 +1,20 @@
-import { CompositionRootConfig } from "./config/compositionRootConfig";
-import { Database } from "./database";
-import { TransactionalEmailAPI } from "../modules/notifications/transactionalEmailAPI";
-import { UsersService } from "../modules/users/usersService";
-import { ContactListAPI } from "../modules/marketing/contactListApi";
-import { MarketingService } from "../modules/marketing/marketingService";
-import { PostsService } from "../modules/posts/postsService";
-import { WebServer } from "./webServer";
-import { UsersController } from "../modules/users/usersController";
-import { MarketingController } from "../modules/marketing";
-import { PostsController } from "../modules/posts/postsController";
-import { userErrorHandler } from "../modules/users/usersError";
-import { marketingErrorHandler } from "../modules/marketing/marketingErrors";
-import { postsErrorHandler } from "../modules/posts/postsError";
+import { CompositionRootConfig } from "../config/compositionRootConfig";
+import { Database } from "../database";
+import { WebServer } from "../webServer";
+
+import { ContactListAPI } from "../../modules/marketing/contactListApi";
+import { MarketingController } from "../../modules/marketing";
+import { marketingErrorHandler } from "../../modules/marketing/marketingErrors";
+import { MarketingService } from "../../modules/marketing/marketingService";
+
+import { PostsController } from "../../modules/posts/postsController";
+import { postsErrorHandler } from "../../modules/posts/postsError";
+import { PostsService } from "../../modules/posts/postsService";
+
+import { TransactionalEmailAPI } from "../../modules/notifications/transactionalEmailAPI";
+import { userErrorHandler } from "../../modules/users/usersError";
+import { UsersController } from "../../modules/users/usersController";
+import { UsersService } from "../../modules/users/usersService";
 
 export class CompositionRoot {
   private static instance: CompositionRoot;

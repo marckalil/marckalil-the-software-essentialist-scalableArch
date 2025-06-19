@@ -3,8 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import { User } from "@dddforum/shared/src/api/users";
 import { Post } from "@dddforum/shared/src/api/posts";
 
-import { generateRandomPassword } from "./utils";
-import { CreateUserDTO } from "../modules/users/createUserDTO";
+import { generateRandomPassword } from "../utils";
+import { CreateUserDTO } from "../../modules/users/createUserDTO";
 interface UsersPersistence {
   save(userData: CreateUserDTO): Promise<User & { password: string }>;
   findUserByEmail(email: string): Promise<User | null>;
