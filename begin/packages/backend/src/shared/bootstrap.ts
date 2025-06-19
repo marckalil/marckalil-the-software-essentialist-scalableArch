@@ -14,4 +14,4 @@ export async function bootstrap() {
 }
 
 export const database = databaseConnection;
-export const app = webServer.getInstance();
+export const app = webServer.getApplication();

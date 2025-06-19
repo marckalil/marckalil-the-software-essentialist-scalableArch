@@ -8,7 +8,9 @@ import { PostsController } from "../modules/posts/postsController";
 const cors = require("cors");
 
 export class WebServer {
-  private _instance: Express;
+  private app: Express;
+  private httpServer: HttpServer | undefined;
+  private state: "started" | "stopped";
   private readonly port: number;
   private readonly usersController: UsersController;
   private readonly marketingController: MarketingController;
@@ -22,7 +24,8 @@ export class WebServer {
       postsController: PostsController;
     }
   ) {
-    this._instance = express();
+    this.app = express();
+    this.state = "stopped";
     this.port = port;
     this.usersController = controllers.usersController;
     this.marketingController = controllers.marketingController;
@@ -31,27 +34,43 @@ export class WebServer {
     this.registerRoutes();
   }
 
-  public getInstance(): Express {
-    return this._instance;
+  public getApplication(): Express {
+    return this.app;
   }
 
   private addMiddleware() {
-    this._instance.use(express.json());
-    this._instance.use(cors());
+    this.app.use(express.json());
+    this.app.use(cors());
   }
 
   private registerRoutes() {
-    this._instance.use("/users", this.usersController.getRouter());
-    this._instance.use("/marketing", this.marketingController.getRouter());
-    this._instance.use("/posts", this.postsController.getRouter());
+    this.app.use("/users", this.usersController.getRouter());
+    this.app.use("/marketing", this.marketingController.getRouter());
+    this.app.use("/posts", this.postsController.getRouter());
   }
 
-  public start() {
+  public stop(): Promise<void> {
     const port = Number(process.env.PORT || this.port);
-    const httpServer = this._instance.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+    return new Promise((resolve, reject) => {
+      if (!this.httpServer) return reject(`No server running on port ${port}.`);
+      this.httpServer.close();
+      console.log(`Server on port ${port} has been stopped.`);
+      this.state = "stopped";
+      resolve();
     });
-    this.enableGracefulShutdown(httpServer);
+  }
+
+  public async start(): Promise<void> {
+    const port = Number(process.env.PORT || this.port);
+    return new Promise((resolve, reject) => {
+      console.log(`Starting server on port ${port}...`);
+      this.httpServer = this.app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+      });
+      this.state = "started";
+      this.enableGracefulShutdown(this.httpServer);
+      resolve();
+    });
   }
 
   private enableGracefulShutdown(httpServer: HttpServer) {

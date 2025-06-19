@@ -10,6 +10,7 @@ import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuild
 import { DatabaseFixtures } from "../support/fixtures/databaseFixtures";
 import { CompositionRootConfig } from "../../src/shared/config/compositionRootConfig";
 import { CompositionRoot } from "../../src/shared/compositionRoot";
+import { WebServer } from "../../src/shared/webServer";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
@@ -17,6 +18,7 @@ const feature = loadFeature(
 
 defineFeature(feature, (test) => {
   let app: Express;
+  let webServer: WebServer;
   let databaseFixtures: DatabaseFixtures;
 
   beforeAll(async () => {
@@ -24,10 +26,15 @@ defineFeature(feature, (test) => {
     const compositionRoot = CompositionRoot.createCompositionRoot(
       compositionRootConfig
     );
-    const webServer = compositionRoot.getWebServer();
-    app = webServer.getInstance();
+    webServer = compositionRoot.getWebServer();
+    app = webServer.getApplication();
     const databaseConnection = compositionRoot.getDatabaseConnection();
     databaseFixtures = new DatabaseFixtures(databaseConnection.getConnection());
+    await webServer.start();
+  });
+
+  afterAll(async () => {
+    await webServer.stop();
   });
 
   beforeEach(async () => {
