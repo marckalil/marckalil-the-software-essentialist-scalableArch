@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { APIResponse, GenericErrors } from ".";
 export type CreateUserInput = {
   email: string;
@@ -20,9 +22,35 @@ export type CreateUserErrors =
   | GenericErrors
   | EmailAlreadyInUseError
   | UsernameAlreadyTakenError;
-export type CreateUserResponse = APIResponse<boolean, CreateUserErrors>;
+
+export type GetUserByEmailErrors = GenericErrors | "UserNotFound";
+export type GetUserErrors = GetUserByEmailErrors | CreateUserErrors;
+
+export type CreateUserResponse = APIResponse<User, CreateUserErrors>;
+export type GetUserByEmailResponse = APIResponse<User, GetUserErrors>;
 
 export type UsersResponse = APIResponse<
-  CreateUserResponse | null,
-  CreateUserErrors
+  CreateUserResponse | GetUserByEmailResponse | null,
+  GetUserErrors
 >;
+
+export const createUsersAPI = (apiURL: string) => ({
+  register: async (input: CreateUserInput) => {
+    try {
+      const successResponse = await axios.post(`${apiURL}/users/new`, input);
+      return successResponse.data as CreateUserResponse;
+    } catch (err) {
+      // @ts-ignore
+      return err.response.data as CreateUserResponse;
+    }
+  },
+  getUserByEmail: async (email: string) => {
+    try {
+      const successResponse = await axios.get(`${apiURL}/users/${email}`);
+      return successResponse.data as GetUserByEmailResponse;
+    } catch (err) {
+      // @ts-ignore
+      return err.response.data as GetUserErrors;
+    }
+  },
+});

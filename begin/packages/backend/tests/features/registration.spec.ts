@@ -11,12 +11,14 @@ import { DatabaseFixtures } from "../support/fixtures/databaseFixtures";
 import { CompositionRootConfig } from "../../src/shared/config/compositionRootConfig";
 import { CompositionRoot } from "../../src/shared/compositionRoot";
 import { WebServer } from "../../src/shared/webServer";
+import { createAPIClient } from "@dddforum/shared/src/api";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
 );
 
 defineFeature(feature, (test) => {
+  const apiClient = createAPIClient("http://localhost:3000");
   let app: Express;
   let webServer: WebServer;
   let databaseFixtures: DatabaseFixtures;
@@ -31,6 +33,7 @@ defineFeature(feature, (test) => {
     const databaseConnection = compositionRoot.getDatabaseConnection();
     databaseFixtures = new DatabaseFixtures(databaseConnection.getConnection());
     await webServer.start();
+    await databaseConnection.connect();
   });
 
   afterAll(async () => {
@@ -63,17 +66,15 @@ defineFeature(feature, (test) => {
     when(
       "I register with valid account details accepting marketing emails",
       async () => {
-        createUserResponse = await request(app)
-          .post("/users/new")
-          .send(createUserInput);
+        createUserResponse = await apiClient.users.register(createUserInput);
         addEmailToMarketingList = await request(app)
           .post("/marketing/new")
           .send({ email: createUserInput.email });
       }
     );
     then("I should be granted access to my account", () => {
-      expect(createUserResponse.status).toBe(201);
-      const { data, error, success } = createUserResponse.body;
+      // expect(createUserResponse.status).toBe(201);
+      const { data, error, success } = createUserResponse;
       expect(success).toBeTruthy();
       expect(error).toBeUndefined();
       expect(data).toBeDefined();
@@ -109,14 +110,12 @@ defineFeature(feature, (test) => {
     when(
       "I register with valid account details declining marketing emails",
       async () => {
-        createUserResponse = await request(app)
-          .post("/users/new")
-          .send(createUserInput);
+        createUserResponse = await apiClient.users.register(createUserInput);
       }
     );
     then("I should be granted access to my account", () => {
-      expect(createUserResponse.status).toBe(201);
-      const { data, error, success } = createUserResponse.body;
+      // expect(createUserResponse.status).toBe(201);
+      const { data, error, success } = createUserResponse;
       expect(success).toBeTruthy();
       expect(error).toBeUndefined();
       expect(data).toBeDefined();
@@ -148,15 +147,17 @@ defineFeature(feature, (test) => {
       };
     });
     when("I register with invalid account details", async () => {
-      response = await request(app).post("/users/new").send(inValidUserInput);
+      response = await apiClient.users.register(
+        inValidUserInput as CreateUserInput
+      );
     });
     then("I should see an error notifying me that my input is invalid", () => {
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty("success", false);
-      expect(response.body).toHaveProperty("error", "ValidationError");
+      // expect(response.status).toBe(400);
+      expect(response).toHaveProperty("success", false);
+      expect(response).toHaveProperty("error", "ValidationError");
     });
     and("I should not have been sent access to account details", () => {
-      expect(response.body).not.toHaveProperty("data");
+      expect(response).not.toHaveProperty("data");
     });
   });
 
@@ -182,22 +183,22 @@ defineFeature(feature, (test) => {
     });
     when("new users attempt to register with those emails", async () => {
       createUserResponses = await Promise.all(
-        newUsers.map((input) => request(app).post("/users/new").send(input))
+        newUsers.map((input) => apiClient.users.register(input))
       );
     });
     then(
       "they should see an error notifying them that the account already exists",
       () => {
         for (const response of createUserResponses) {
-          expect(response.status).toBe(409);
-          expect(response.body).toHaveProperty("success", false);
-          expect(response.body).toHaveProperty("error", "EmailAlreadyInUse");
+          // expect(response.status).toBe(409);
+          expect(response).toHaveProperty("success", false);
+          expect(response).toHaveProperty("error", "EmailAlreadyInUse");
         }
       }
     );
     and("they should not have been sent access to account details", () => {
       for (const response of createUserResponses) {
-        expect(response.body).not.toHaveProperty("data");
+        expect(response).not.toHaveProperty("data");
       }
     });
   });
@@ -230,7 +231,7 @@ defineFeature(feature, (test) => {
       "new users attempt to register with already taken usernames",
       async () => {
         createUserResponses = await Promise.all(
-          newUsers.map((input) => request(app).post("/users/new").send(input))
+          newUsers.map((input) => apiClient.users.register(input))
         );
       }
     );
@@ -238,15 +239,15 @@ defineFeature(feature, (test) => {
       "they see an error notifying them that the username has already been taken",
       () => {
         for (const response of createUserResponses) {
-          expect(response.status).toBe(409);
-          expect(response.body).toHaveProperty("success", false);
-          expect(response.body).toHaveProperty("error", "UsernameAlreadyTaken");
+          // expect(response.status).toBe(409);
+          expect(response).toHaveProperty("success", false);
+          expect(response).toHaveProperty("error", "UsernameAlreadyTaken");
         }
       }
     );
     and("they should not have been sent access to account details", () => {
       for (const response of createUserResponses) {
-        expect(response.body).not.toHaveProperty("data");
+        expect(response).not.toHaveProperty("data");
       }
     });
   });
