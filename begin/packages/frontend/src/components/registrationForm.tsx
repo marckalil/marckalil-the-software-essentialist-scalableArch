@@ -1,28 +1,26 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-export type RegistrationInput = {
-  email: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-}
+import { CreateUserInput } from "@dddforum/shared/src/api/users";
 
 interface RegistrationFormProps {
-  onSubmit: (formDetails: RegistrationInput) => void;
+  onSubmit: (formDetails: CreateUserInput) => void;
 }
 
 export const RegistrationForm = (props: RegistrationFormProps) => {
-  const [email, setEmail] = useState('email');
-  const [username, setUsername] = useState('username');
-  const [firstName, setFirstName] = useState('firstName');
-  const [lastName, setLastName] = useState('lastName');
+  const [email, setEmail] = useState("email");
+  const [username, setUsername] = useState("username");
+  const [firstName, setFirstName] = useState("firstName");
+  const [lastName, setLastName] = useState("lastName");
 
   const handleSubmit = () => {
     props.onSubmit({
-      email, username, firstName, lastName
-    })
-  }
+      email,
+      username,
+      firstName,
+      lastName,
+    });
+  };
 
   return (
     <div className="registration-form">
@@ -56,10 +54,14 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
           <div>Already have an account?</div>
           <Link to="/login">Login</Link>
         </div>
-        <button onClick={() => handleSubmit()} className="submit-button" type="submit">
+        <button
+          onClick={() => handleSubmit()}
+          className="submit-button"
+          type="submit"
+        >
           Submit
         </button>
       </div>
     </div>
   );
-}
+};

@@ -1,25 +1,14 @@
-
-import React from 'react'
+import React from "react";
 
 import { Link } from "react-router-dom";
 import arrow from "../assets/arrow.svg";
-import moment from 'moment';
+import moment from "moment";
 
-
-type Vote = { id: number, postId: number, voteType: 'Upvote' | 'Downvote' };
-type Comment = {};
-
-type Post = {
-  title: string;
-  dateCreated: string;
-  memberPostedBy: any;
-  comments: Comment[];
-  votes: Vote[]
-};
+import { Post, Vote } from "@dddforum/shared/src/api/posts";
 
 function computeVoteCount(votes: Vote[]) {
   let count = 0;
-  votes.forEach((v) => v.voteType === 'Upvote' ? count++ : count--);
+  votes.forEach((v) => (v.voteType === "Upvote" ? count++ : count--));
   return count;
 }
 
@@ -39,14 +28,14 @@ export const PostsList = ({ posts }: { posts: Post[] }) => (
         <div className="post-item-content">
           <div className="post-item-title">{post.title}</div>
           <div className="post-item-details">
-          <div>{moment(post.dateCreated).fromNow()}</div>
-          <Link to={`/member/${post.memberPostedBy.user.username}`}>
-            by {post.memberPostedBy.user.username}
-          </Link>
-          <div>
-            {post.comments.length}{" "}
-            {post.comments.length !== 1 ? `comments` : "comment"}
-          </div>
+            <div>{moment(post.dateCreated).fromNow()}</div>
+            <Link to={`/member/${post.memberPostedBy.user.username}`}>
+              by {post.memberPostedBy.user.username}
+            </Link>
+            <div>
+              {post.comments.length}{" "}
+              {post.comments.length !== 1 ? `comments` : "comment"}
+            </div>
           </div>
         </div>
       </div>
