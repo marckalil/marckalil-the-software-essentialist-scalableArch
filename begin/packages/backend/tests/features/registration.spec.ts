@@ -67,9 +67,9 @@ defineFeature(feature, (test) => {
       "I register with valid account details accepting marketing emails",
       async () => {
         createUserResponse = await apiClient.users.register(createUserInput);
-        addEmailToMarketingList = await request(app)
-          .post("/marketing/new")
-          .send({ email: createUserInput.email });
+        addEmailToMarketingList = await apiClient.marketing.addEmailToList(
+          createUserInput.email
+        );
       }
     );
     then("I should be granted access to my account", () => {
@@ -85,7 +85,8 @@ defineFeature(feature, (test) => {
       expect(data).toHaveProperty("username", createUserInput.username);
     });
     and("I should expect to receive marketing emails", () => {
-      expect(addEmailToMarketingList.status).toBe(201);
+      // expect(addEmailToMarketingList.status).toBe(201);
+      expect(addEmailToMarketingList).toHaveProperty("success", true);
     });
   });
 
