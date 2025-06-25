@@ -35,7 +35,7 @@ export class PostsController {
       const posts = await this.postsService.getAllPosts();
       return res.json({
         error: undefined,
-        data: { posts },
+        data: posts,
         success: true,
       });
     } catch (error) {

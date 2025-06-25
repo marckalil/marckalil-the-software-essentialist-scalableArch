@@ -1,5 +1,5 @@
-import { CompositionRootConfig } from "./config/compositionRootConfig";
-import { CompositionRoot } from "./compositionRoot";
+import { CompositionRootConfig } from "../config/compositionRootConfig";
+import { CompositionRoot } from "../compositionRoot";
 
 const compositionRootConfig = new CompositionRootConfig("start");
 const compositionRoot = CompositionRoot.createCompositionRoot(
