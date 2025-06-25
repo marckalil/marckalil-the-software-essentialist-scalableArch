@@ -1,4 +1,5 @@
 import { createMarketingAPI } from "./marketing";
+import { createPostsAPI } from "./posts";
 import { createUsersAPI } from "./users";
 
 export type Error<U> = {
@@ -21,6 +22,6 @@ export function createAPIClient(apiURL: string) {
   return {
     users: createUsersAPI(apiURL),
     marketing: createMarketingAPI(apiURL),
-    // posts: createPostsAPI(apiURL),
+    posts: createPostsAPI(apiURL),
   };
 }

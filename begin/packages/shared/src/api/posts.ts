@@ -1,3 +1,4 @@
+import axios from "axios";
 import { APIResponse, GenericErrors } from ".";
 import { User } from "./users";
 
@@ -33,3 +34,17 @@ export type GetPostsErrors = GenericErrors;
 export type GetPostsResponse = APIResponse<Post[], GetPostsErrors>;
 
 export type PostsResponse = GetPostsResponse;
+
+export const createPostsAPI = (apiURL: string) => {
+  return {
+    getPosts: async (sort: GetPostsSortOption): Promise<PostsResponse> => {
+      try {
+        const successResponse = await axios.get(`${apiURL}/posts?sort=${sort}`);
+        return successResponse.data as GetPostsResponse;
+      } catch (err) {
+        //@ts-ignore
+        return err.response.data as GetPostsResponse;
+      }
+    },
+  };
+};
