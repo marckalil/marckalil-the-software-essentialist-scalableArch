@@ -1,18 +1,18 @@
-import { Request, Response, NextFunction } from "express";
-import { CustomException } from "../../shared/exceptions";
+import { NextFunction, Request, Response } from "express";
 import { MarketingResponse } from "@dddforum/shared/src/api/marketing";
+import { CustomException } from "../../shared/exceptions";
 
 export function marketingErrorHandler(
   error: CustomException,
   _: Request,
   res: Response,
-  _next: NextFunction
+  next: NextFunction
 ): Response<MarketingResponse> {
   let responseBody: MarketingResponse;
   if (error.type === "InvalidRequestBodyException") {
     responseBody = {
       success: false,
-      data: null,
+      data: false,
       error: {
         message: error.message,
         code: "ValidationError",
@@ -23,7 +23,7 @@ export function marketingErrorHandler(
 
   responseBody = {
     success: false,
-    data: null,
+    data: false,
     error: {
       code: "ServerError",
     },

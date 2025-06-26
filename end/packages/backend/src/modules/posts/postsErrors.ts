@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { CustomException } from "../../shared/exceptions";
+
 import { PostsResponse } from "@dddforum/shared/src/api/posts";
 
 export function postsErrorHandler(
   error: CustomException,
   _: Request,
   res: Response,
-  _next: NextFunction,
+  _next: NextFunction
 ): Response<PostsResponse> {
   const responseBody = {
     success: false,
