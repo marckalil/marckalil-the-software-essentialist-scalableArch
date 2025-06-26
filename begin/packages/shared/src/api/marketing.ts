@@ -4,10 +4,7 @@ import { APIResponse, GenericErrors } from ".";
 export type AddEmailToListErrors = GenericErrors;
 export type AddEmailToListResponse = APIResponse<boolean, AddEmailToListErrors>;
 
-export type MarketingResponse = APIResponse<
-  AddEmailToListResponse | null,
-  AddEmailToListErrors
->;
+export type MarketingResponse = AddEmailToListResponse;
 
 export const createMarketingAPI = (apiURL: string) => ({
   addEmailToList: async (email: string) => {

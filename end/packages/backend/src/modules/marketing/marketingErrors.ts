@@ -6,7 +6,7 @@ export function marketingErrorHandler(
   error: CustomException,
   _: Request,
   res: Response,
-  _next: NextFunction,
+  _next: NextFunction
 ): Response<MarketingResponse> {
   let responseBody: MarketingResponse;
   if (error.type === "InvalidRequestBodyException") {

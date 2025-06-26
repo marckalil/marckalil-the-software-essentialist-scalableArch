@@ -12,7 +12,7 @@ export function marketingErrorHandler(
   if (error.type === "InvalidRequestBodyException") {
     responseBody = {
       success: false,
-      data: null,
+      data: false,
       error: {
         message: error.message,
         code: "ValidationError",
@@ -23,7 +23,7 @@ export function marketingErrorHandler(
 
   responseBody = {
     success: false,
-    data: null,
+    data: false,
     error: {
       code: "ServerError",
     },

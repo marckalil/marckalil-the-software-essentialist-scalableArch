@@ -29,10 +29,7 @@ export type GetUserErrors = GetUserByEmailErrors | CreateUserErrors;
 export type CreateUserResponse = APIResponse<User, CreateUserErrors>;
 export type GetUserByEmailResponse = APIResponse<User, GetUserErrors>;
 
-export type UsersResponse = APIResponse<
-  CreateUserResponse | GetUserByEmailResponse | null,
-  GetUserErrors
->;
+export type UsersResponse = CreateUserResponse | GetUserByEmailResponse;
 
 export const createUsersAPI = (apiURL: string) => ({
   register: async (input: CreateUserInput) => {
