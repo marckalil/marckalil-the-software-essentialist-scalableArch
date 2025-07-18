@@ -10,19 +10,19 @@ export abstract class Component {
 
 type ElementType = "input" | "checkbox" | "button" | "div";
 
-type PageElementSelector =
+export type PageElementSelector =
   | {
       selector: string;
       type: ElementType;
     }
   | Component;
-interface PageElementConfig {
+export interface PageElementsConfig {
   [key: string]: PageElementSelector;
 }
 
 export class PageElements {
   constructor(
-    private elementsConfig: PageElementConfig,
+    private elementsConfig: PageElementsConfig,
     private driver: PuppeteerPageDriver
   ) {}
 

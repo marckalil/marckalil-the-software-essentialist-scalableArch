@@ -1,7 +1,8 @@
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
 import { PageObject } from "./PageObject";
 import { PuppeteerPageDriver } from "../driver";
-import { PageElements } from "../components/component";
+import { PageElements, PageElementsConfig } from "../components/component";
+import { appSelectors } from "../../../shared/selectors";
 
 export class RegistrationPage extends PageObject {
   private elements: PageElements;
@@ -12,20 +13,7 @@ export class RegistrationPage extends PageObject {
 
   private createPageElements(): PageElements {
     return new PageElements(
-      {
-        email: { selector: ".registration.email", type: "input" },
-        username: { selector: ".registration.username", type: "input" },
-        firstName: { selector: ".registration.first-name", type: "input" },
-        lastName: { selector: ".registration.last-name", type: "input" },
-        marketingCheckbox: {
-          selector: ".registration.marketing-checkbox",
-          type: "checkbox",
-        },
-        submitButton: {
-          selector: ".registration.submit-button",
-          type: "button",
-        },
-      },
+      appSelectors.registration.registrationForm as PageElementsConfig,
       this.driver
     );
   }
@@ -37,10 +25,10 @@ export class RegistrationPage extends PageObject {
     const usernameElement = await this.elements.get("username");
     await usernameElement.type(userInput.username);
 
-    const firstNameElement = await this.elements.get("firstName");
+    const firstNameElement = await this.elements.get("firstname");
     await firstNameElement.type(userInput.firstName);
 
-    const lastNameElement = await this.elements.get("lastName");
+    const lastNameElement = await this.elements.get("lastname");
     await lastNameElement.type(userInput.lastName);
   }
 
@@ -50,7 +38,7 @@ export class RegistrationPage extends PageObject {
   }
 
   public async submitForm(): Promise<void> {
-    const submitElement = await this.elements.get("submitButton");
+    const submitElement = await this.elements.get("submit");
     await submitElement.click();
   }
 }

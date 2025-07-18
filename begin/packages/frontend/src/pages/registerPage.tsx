@@ -1,12 +1,15 @@
-import { Layout } from "../components/layout";
-import { RegistrationForm } from "../components/registrationForm";
-import { ToastContainer, toast } from "react-toastify";
-import { useUser } from "../contexts/userContext";
 import { useNavigate } from "react-router-dom";
-import { useSpinner } from "../contexts/spinnerContext";
-import { OverlaySpinner } from "../components/overlaySpinner";
+import { ToastContainer, toast } from "react-toastify";
+
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
+
 import { api } from "../App";
+import { Layout } from "../components/layout";
+import { OverlaySpinner } from "../components/overlaySpinner";
+import { RegistrationForm } from "../components/registrationForm";
+import { useSpinner } from "../contexts/spinnerContext";
+import { useUser } from "../contexts/userContext";
+import { toId, appSelectors } from "../../shared/selectors";
 
 type ValidationResult = {
   success: boolean;
@@ -37,7 +40,7 @@ export const RegisterPage = () => {
     if (!validationResult.success) {
       // Show an error toast (for invalid input)
       return toast.error(validationResult.errorMessage, {
-        toastId: `failure-toast`,
+        toastId: toId(appSelectors.notifications.failure),
       });
     }
 
@@ -51,12 +54,12 @@ export const RegisterPage = () => {
           case "UsernameAlreadyTaken":
             spinner.deactivate();
             return toast.error("Account already exists", {
-              toastId: `failure-toast`,
+              toastId: toId(appSelectors.notifications.failure),
             });
           case "EmailAlreadyInUse":
             spinner.deactivate();
             return toast.error("Email already in use", {
-              toastId: `failure-toast`,
+              toastId: toId(appSelectors.notifications.failure),
             });
           default:
             // Client processing error
@@ -74,7 +77,7 @@ export const RegisterPage = () => {
       spinner.deactivate();
       // Show the toast
       toast("Success! Redirecting home.", {
-        toastId: "success-toast",
+        toastId: toId(appSelectors.notifications.success),
       });
       // In 3 seconds, redirect to the main page
       setTimeout(() => {
@@ -86,7 +89,7 @@ export const RegisterPage = () => {
       spinner.deactivate();
       // Show the toast (for unknown error)
       return toast.error("Some backend error occurred", {
-        toastId: "failure-toast",
+        toastId: toId(appSelectors.notifications.failure),
       });
     }
   };

@@ -1,5 +1,6 @@
-import { Component, PageElements } from "./component";
+import { Component, PageElements, PageElementSelector } from "./component";
 import { PuppeteerPageDriver } from "../driver";
+import { appSelectors } from "../../../shared/selectors";
 
 export class HeaderComponent extends Component {
   private elements: PageElements;
@@ -8,7 +9,7 @@ export class HeaderComponent extends Component {
     super(driver);
     this.elements = new PageElements(
       {
-        header: { selector: ".header.username", type: "div" },
+        header: appSelectors.header as PageElementSelector,
       },
       driver
     );

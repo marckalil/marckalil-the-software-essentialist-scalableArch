@@ -1,7 +1,9 @@
 import React from "react";
-import logo from "../assets/dddforumlogo.png";
 import { Link, useLocation } from "react-router-dom";
+
+import logo from "../assets/dddforumlogo.png";
 import { UserData, useUser } from "../contexts/userContext";
+import { toClass, appSelectors } from "../../shared/selectors";
 
 const Logo = () => (
   <div id="app-logo">
@@ -19,7 +21,7 @@ const TitleAndSubmission = () => (
 const HeaderActionButton = ({ user }: { user: UserData | null }) => (
   <div id="header-action-button">
     {user ? (
-      <div className="header username">
+      <div className={toClass(appSelectors.header.selector)}>
         <div>{user.username}</div>
         <u>
           <div>logout</div>
@@ -35,7 +37,7 @@ const shouldShowActionButton = (pathName: string) => {
   return pathName !== "/join";
 };
 
-export const Header = ({}) => {
+export const Header = () => {
   const { user } = useUser();
   const location = useLocation();
   console.log(user);

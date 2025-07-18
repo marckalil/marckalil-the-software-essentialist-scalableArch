@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
+import { toClass, appSelectors } from "../../shared/selectors";
 
 interface RegistrationFormProps {
   onSubmit: (
@@ -37,25 +38,33 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
     <div className="registration-form">
       <div>Create Account</div>
       <input
-        className="registration email"
+        className={toClass(
+          appSelectors.registration.registrationForm.email.selector
+        )}
         type="email"
         placeholder="email"
         onChange={(e) => setEmail(e.target.value)}
       ></input>
       <input
-        className="registration username"
+        className={toClass(
+          appSelectors.registration.registrationForm.username.selector
+        )}
         type="text"
         placeholder="username"
         onChange={(e) => setUsername(e.target.value)}
       ></input>
       <input
-        className="registration first-name"
+        className={toClass(
+          appSelectors.registration.registrationForm.firstname.selector
+        )}
         type="text"
         placeholder="first name"
         onChange={(e) => setFirstName(e.target.value)}
       ></input>
       <input
-        className="registration last-name"
+        className={toClass(
+          appSelectors.registration.registrationForm.lastname.selector
+        )}
         type="text"
         placeholder="last name"
         onChange={(e) => setLastName(e.target.value)}
@@ -67,14 +76,19 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
         </div>
         <button
           onClick={() => handleSubmit()}
-          className="registration submit-button"
+          className={toClass(
+            appSelectors.registration.registrationForm.submit.selector
+          )}
           type="submit"
         >
           Submit
         </button>
         <label>
           <input
-            className="registration marketing-checkbox"
+            className={toClass(
+              appSelectors.registration.registrationForm.marketingCheckbox
+                .selector
+            )}
             type="checkbox"
             checked={allowMarketingEmails}
             onChange={() => toggleAllowMarketingEmails()}
