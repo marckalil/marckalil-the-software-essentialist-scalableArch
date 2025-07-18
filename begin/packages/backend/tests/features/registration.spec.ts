@@ -1,17 +1,16 @@
 import type { Express } from "express";
 import { defineFeature, loadFeature } from "jest-cucumber";
 import path from "path";
-import request from "supertest";
 
-import type { CreateUserInput } from "@dddforum/shared/src/api/users";
+import { createAPIClient } from "@dddforum/shared/src/api";
+import { CreateUserInputBuilder } from "@dddforum/shared/tests/support/builders/CreateUserInputBuilder";
+import { DatabaseFixtures } from "@dddforum/shared/tests/support/fixtures/databaseFixtures";
 import { sharedTestRoot } from "@dddforum/shared/src/paths";
+import type { CreateUserInput } from "@dddforum/shared/src/api/users";
 
-import { CreateUserInputBuilder } from "../support/builders/CreateUserInputBuilder";
-import { DatabaseFixtures } from "../support/fixtures/databaseFixtures";
 import { CompositionRootConfig } from "../../src/shared/config/compositionRootConfig";
 import { CompositionRoot } from "../../src/shared/compositionRoot";
 import { WebServer } from "../../src/shared/webServer";
-import { createAPIClient } from "@dddforum/shared/src/api";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature")
