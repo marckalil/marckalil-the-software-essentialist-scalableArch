@@ -1,7 +1,7 @@
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
 import { PageObject } from "./PageObject";
 import { PuppeteerPageDriver } from "../driver";
-import { create } from "domain";
+import { PageElements } from "../components/component";
 
 export class RegistrationPage extends PageObject {
   private elements: PageElements;
@@ -11,17 +11,23 @@ export class RegistrationPage extends PageObject {
   }
 
   private createPageElements(): PageElements {
-    return new PageElements({
-      email: { selector: ".registration.email", type: "input" },
-      firstName: { selector: ".registration.first-name", type: "input" },
-      lastName: { selector: ".registration.last-name", type: "input" },
-      username: { selector: ".registration.username", type: "input" },
-      marketingCheckbox: {
-        selector: ".registration.marketing-checkbox",
-        type: "checkbox",
+    return new PageElements(
+      {
+        email: { selector: ".registration.email", type: "input" },
+        firstName: { selector: ".registration.first-name", type: "input" },
+        lastName: { selector: ".registration.last-name", type: "input" },
+        username: { selector: ".registration.username", type: "input" },
+        marketingCheckbox: {
+          selector: ".registration.marketing-checkbox",
+          type: "checkbox",
+        },
+        submitButton: {
+          selector: ".registration.submit-button",
+          type: "button",
+        },
       },
-      submitButton: { selector: ".registration.submit-button", type: "button" },
-    });
+      this.driver
+    );
   }
 
   public async enterFormDetails(userInput: CreateUserInput): Promise<void> {

@@ -7,3 +7,42 @@ export abstract class Component {
     this.driver = driver;
   }
 }
+
+type ElementType = "input" | "checkbox" | "button" | "div";
+
+type PageElementSelector =
+  | {
+      selector: string;
+      type: ElementType;
+    }
+  | Component;
+interface PageElementConfig {
+  [key: string]: PageElementSelector;
+}
+
+export class PageElements {
+  constructor(
+    private elementsConfig: PageElementConfig,
+    private driver: PuppeteerPageDriver
+  ) {}
+
+  public async get(key: string, timeout?: number) {
+    const component = this.elementsConfig[key];
+    let element;
+
+    if (component instanceof Component) {
+      return component;
+    }
+
+    try {
+      element = await this.driver.page.waitForSelector(component.selector, {
+        timeout,
+      });
+    } catch (error) {
+      console.error(`Element not found: ${key}`);
+      throw new Error(`Element not found: ${key}`);
+    }
+
+    return element;
+  }
+}
