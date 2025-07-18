@@ -30,7 +30,7 @@ defineFeature(feature, (test) => {
     webServer = compositionRoot.getWebServer();
     app = webServer.getApplication();
     const databaseConnection = compositionRoot.getDatabaseConnection();
-    databaseFixtures = new DatabaseFixtures(databaseConnection.getConnection());
+    databaseFixtures = new DatabaseFixtures();
     await webServer.start();
     await databaseConnection.connect();
   });
