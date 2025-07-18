@@ -1,3 +1,1 @@
-export class PuppeteerPageDriver {
-  public static async create() {}
-}
+export * from "./puppeteerPageDriver";
