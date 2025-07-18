@@ -1,10 +1,8 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import * as path from "path";
-
-import { CreateUserInput } from "@dddforum/shared/src/api/users";
-import { CreateUserInputBuilder } from "@dddforum/shared/tests/support/builders/CreateUserInputBuilder";
-import { DatabaseFixtures } from "@dddforum/shared/tests/support/fixtures/databaseFixtures";
 import { sharedTestRoot } from "@dddforum/shared/src/paths";
+import * as path from "path";
+import { DatabaseFixtures } from "@dddforum/shared/tests/support/fixtures/databaseFixtures";
+import { CreateUserInput } from "@dddforum/shared/src/api/users";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature"),
