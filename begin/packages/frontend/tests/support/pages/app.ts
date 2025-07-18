@@ -1,10 +1,11 @@
 import { PuppeteerPageDriver } from "../driver";
-import { HeaderComponent } from "../components";
+import { AppNotifications, HeaderComponent } from "../components";
 import { RegistrationPage } from "./registrationPage";
 
 export interface App {
   pages: Pages;
   layout: Layout;
+  notifications: AppNotifications;
 }
 
 export interface Pages {
@@ -25,5 +26,6 @@ export function createAppObject(puppeteerPageDriver: PuppeteerPageDriver): App {
     layout: {
       header: new HeaderComponent(puppeteerPageDriver),
     },
+    notifications: new AppNotifications(puppeteerPageDriver),
   };
 }

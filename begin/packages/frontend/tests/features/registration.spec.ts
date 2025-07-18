@@ -17,6 +17,7 @@ const feature = loadFeature(
 
 defineFeature(feature, (test) => {
   let userInput: CreateUserInput;
+  let users: CreateUserInput[];
   let databaseFixtures: DatabaseFixtures;
   let app: App;
   let pages: Pages;
@@ -50,10 +51,8 @@ defineFeature(feature, (test) => {
   }) => {
     given("I am a new user", () => {
       userInput = new CreateUserInputBuilder()
-        .withEmail("randy.marsh@sp.com")
-        .withFirstName("Randy")
-        .withLastName("Marsh")
-        .withUsername("randy.marsh")
+        .withAllRandomDetails()
+        .withEmail("test@example.com")
         .build();
     });
     when(
@@ -81,11 +80,26 @@ defineFeature(feature, (test) => {
     then,
     and,
   }) => {
-    given("I am a new user", () => {});
-    when("I register with invalid account details", async () => {});
+    given("I am a new user", async () => {
+      userInput = new CreateUserInputBuilder()
+        .withAllRandomDetails()
+        .withEmail("")
+        .build();
+    });
+    when("I register with invalid account details", async () => {
+      await pages.registration.open();
+      await pages.registration.enterFormDetails(userInput);
+      await pages.registration.acceptMarketingEmails();
+      await pages.registration.submitForm();
+    });
     then(
       "I should see an error notifying me that my input is invalid",
-      async () => {}
+      async () => {
+        const errorNotification =
+          await app.notifications.getErrorNotificationText();
+        expect(errorNotification).toBeDefined();
+        expect(errorNotification).toContain("invalid");
+      }
     );
     and("I should not have been sent access to account details", () => {
       // @See backend
@@ -93,11 +107,38 @@ defineFeature(feature, (test) => {
   });
 
   test("Account already created with email", ({ given, when, then, and }) => {
-    given("a set of users already created accounts", () => {});
-    when("new users attempt to register with those emails", async () => {});
+    given(
+      "a set of users already created accounts",
+      async (table: CreateUserInput[]) => {
+        users = table.map((user) => {
+          return new CreateUserInputBuilder()
+            .withAllRandomDetails()
+            .withEmail(user.email)
+            .withFirstName(user.firstName)
+            .withLastName(user.lastName)
+            .build();
+        });
+        await databaseFixtures.setUpWithExistingUsers(users);
+      }
+    );
+    when("new users attempt to register with those emails", async () => {
+      userInput = new CreateUserInputBuilder()
+        .withAllRandomDetails()
+        .withEmail(users[0].email)
+        .build();
+      await pages.registration.open();
+      await pages.registration.enterFormDetails(userInput);
+      await pages.registration.acceptMarketingEmails();
+      await pages.registration.submitForm();
+    });
     then(
       "they should see an error notifying them that the account already exists",
-      async () => {}
+      async () => {
+        const errorNotification =
+          await app.notifications.getErrorNotificationText();
+        expect(errorNotification).toBeDefined();
+        expect(errorNotification).toContain("already in use");
+      }
     );
     and("they should not have been sent access to account details", () => {
       // @See backend
