@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "../assets/dddforumlogo.png";
-import { Link, useLocation, useRoutes } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { UserData, useUser } from "../contexts/userContext";
 
 const Logo = () => (
@@ -19,7 +19,7 @@ const TitleAndSubmission = () => (
 const HeaderActionButton = ({ user }: { user: UserData | null }) => (
   <div id="header-action-button">
     {user ? (
-      <div>
+      <div className="header username">
         <div>{user.username}</div>
         <u>
           <div>logout</div>

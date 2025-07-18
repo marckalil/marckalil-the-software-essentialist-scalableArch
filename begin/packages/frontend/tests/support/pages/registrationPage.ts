@@ -14,9 +14,9 @@ export class RegistrationPage extends PageObject {
     return new PageElements(
       {
         email: { selector: ".registration.email", type: "input" },
+        username: { selector: ".registration.username", type: "input" },
         firstName: { selector: ".registration.first-name", type: "input" },
         lastName: { selector: ".registration.last-name", type: "input" },
-        username: { selector: ".registration.username", type: "input" },
         marketingCheckbox: {
           selector: ".registration.marketing-checkbox",
           type: "checkbox",
@@ -31,23 +31,26 @@ export class RegistrationPage extends PageObject {
   }
 
   public async enterFormDetails(userInput: CreateUserInput): Promise<void> {
-    this.elements.get("email").then((element) => element.type(userInput.email));
-    this.elements
-      .get("firstName")
-      .then((element) => element.type(userInput.firstName));
-    this.elements
-      .get("lastName")
-      .then((element) => element.type(userInput.lastName));
-    this.elements
-      .get("username")
-      .then((element) => element.type(userInput.username));
+    const emailElement = await this.elements.get("email");
+    await emailElement.type(userInput.email);
+
+    const usernameElement = await this.elements.get("username");
+    await usernameElement.type(userInput.username);
+
+    const firstNameElement = await this.elements.get("firstName");
+    await firstNameElement.type(userInput.firstName);
+
+    const lastNameElement = await this.elements.get("lastName");
+    await lastNameElement.type(userInput.lastName);
   }
 
   public async acceptMarketingEmails(): Promise<void> {
-    this.elements.get("marketingCheckbox").then((element) => element.click());
+    const checkboxElement = await this.elements.get("marketingCheckbox");
+    await checkboxElement.click();
   }
 
   public async submitForm(): Promise<void> {
-    this.elements.get("submitButton").then((element) => element.click());
+    const submitElement = await this.elements.get("submitButton");
+    await submitElement.click();
   }
 }

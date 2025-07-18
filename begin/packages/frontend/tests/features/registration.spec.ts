@@ -8,7 +8,7 @@ import { CreateUserInputBuilder } from "@dddforum/shared/tests/support/builders/
 import { DatabaseFixtures } from "@dddforum/shared/tests/support/fixtures/databaseFixtures";
 
 import { PuppeteerPageDriver } from "../support/driver";
-import { App, Layout, Pages } from "../support/pages";
+import { App, createAppObject, Layout, Pages } from "../support/pages";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature"),
@@ -30,8 +30,8 @@ defineFeature(feature, (test) => {
       slowMo: 50,
     });
     app = createAppObject(puppeteerPageDriver);
-    pages = app.pages();
-    layout = app.layout();
+    pages = app.pages;
+    layout = app.layout;
   });
 
   beforeEach(async () => {
@@ -49,7 +49,12 @@ defineFeature(feature, (test) => {
     and,
   }) => {
     given("I am a new user", () => {
-      userInput = new CreateUserInputBuilder().withAllRandomDetails().build();
+      userInput = new CreateUserInputBuilder()
+        .withEmail("randy.marsh@sp.com")
+        .withFirstName("Randy")
+        .withLastName("Marsh")
+        .withUsername("randy.marsh")
+        .build();
     });
     when(
       "I register with valid account details accepting marketing emails",

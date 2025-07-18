@@ -11,10 +11,10 @@ interface RegistrationFormProps {
 }
 
 export const RegistrationForm = (props: RegistrationFormProps) => {
-  const [email, setEmail] = useState("email");
-  const [username, setUsername] = useState("username");
-  const [firstName, setFirstName] = useState("firstName");
-  const [lastName, setLastName] = useState("lastName");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [allowMarketingEmails, setAllowMarketingEmails] = useState(false);
 
   const toggleAllowMarketingEmails = () => {
@@ -74,7 +74,7 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
         </button>
         <label>
           <input
-            className="registration marketing-emails"
+            className="registration marketing-checkbox"
             type="checkbox"
             checked={allowMarketingEmails}
             onChange={() => toggleAllowMarketingEmails()}
