@@ -11,7 +11,7 @@ export function userErrorHandler(
 ): Response<UsersResponse> {
   if (error.type === "InvalidRequestBodyException") {
     return res.status(400).json({
-      error: "ValidationError",
+      error: { code: "ValidationError" },
       data: undefined,
       success: false,
     });
@@ -19,7 +19,7 @@ export function userErrorHandler(
 
   if (error.type === "EmailAlreadyInUseException") {
     return res.status(409).json({
-      error: "EmailAlreadyInUse",
+      error: { code: "EmailAlreadyInUse" },
       data: undefined,
       success: false,
     });
@@ -27,14 +27,14 @@ export function userErrorHandler(
 
   if (error.type === "UsernameAlreadyTakenException") {
     return res.status(409).json({
-      error: "UsernameAlreadyTaken",
+      error: { code: "UsernameAlreadyTaken" },
       data: undefined,
       success: false,
     });
   }
 
   return res.status(500).json({
-    error: "ServerError",
+    error: { code: "ServerError" },
     data: undefined,
     success: false,
   });

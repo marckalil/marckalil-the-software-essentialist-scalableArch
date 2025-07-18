@@ -1,0 +1,147 @@
+import * as path from "path";
+
+import { defineFeature, loadFeature } from "jest-cucumber";
+
+import { CreateUserInput } from "@dddforum/shared/src/api/users";
+import { sharedTestRoot } from "@dddforum/shared/src/paths";
+import { CreateUserInputBuilder } from "@dddforum/shared/tests/support/builders/CreateUserInputBuilder";
+import { DatabaseFixtures } from "@dddforum/shared/tests/support/fixtures/databaseFixtures";
+
+import { PuppeteerPageDriver } from "../support/driver";
+import { App, createAppObject, Layout, Pages } from "../support/pages";
+
+const feature = loadFeature(
+  path.join(sharedTestRoot, "features/registration.feature"),
+  { tagFilter: "@frontend" }
+);
+
+defineFeature(feature, (test) => {
+  let userInput: CreateUserInput;
+  let users: CreateUserInput[];
+  let databaseFixtures: DatabaseFixtures;
+  let app: App;
+  let pages: Pages;
+  let layout: Layout;
+  let puppeteerPageDriver: PuppeteerPageDriver;
+
+  beforeAll(async () => {
+    databaseFixtures = new DatabaseFixtures();
+    puppeteerPageDriver = await PuppeteerPageDriver.create({
+      headless: false,
+      slowMo: 50,
+    });
+    app = createAppObject(puppeteerPageDriver);
+    pages = app.pages;
+    layout = app.layout;
+  });
+
+  beforeEach(async () => {
+    await databaseFixtures.reset();
+  });
+
+  afterAll(async () => {
+    await puppeteerPageDriver.browser.close();
+  });
+
+  test("Successful registration with marketing emails accepted", ({
+    given,
+    when,
+    then,
+    and,
+  }) => {
+    given("I am a new user", () => {
+      userInput = new CreateUserInputBuilder()
+        .withAllRandomDetails()
+        .withEmail("test@example.com")
+        .build();
+    });
+    when(
+      "I register with valid account details accepting marketing emails",
+      async () => {
+        await pages.registration.open();
+        await pages.registration.enterFormDetails(userInput);
+        await pages.registration.acceptMarketingEmails();
+        await pages.registration.submitForm();
+      }
+    );
+    then("I should be granted access to my account", async () => {
+      const username = await layout.header.getUsernameFromHeader();
+      expect(username).toBeDefined();
+      expect(username).toContain(userInput.username);
+    });
+    and("I should expect to receive marketing emails", () => {
+      // @See backend
+    });
+  });
+
+  test("Invalid or missing registration details", ({
+    given,
+    when,
+    then,
+    and,
+  }) => {
+    given("I am a new user", async () => {
+      userInput = new CreateUserInputBuilder()
+        .withAllRandomDetails()
+        .withEmail("")
+        .build();
+    });
+    when("I register with invalid account details", async () => {
+      await pages.registration.open();
+      await pages.registration.enterFormDetails(userInput);
+      await pages.registration.acceptMarketingEmails();
+      await pages.registration.submitForm();
+    });
+    then(
+      "I should see an error notifying me that my input is invalid",
+      async () => {
+        const errorNotification =
+          await app.notifications.getErrorNotificationText();
+        expect(errorNotification).toBeDefined();
+        expect(errorNotification).toContain("invalid");
+      }
+    );
+    and("I should not have been sent access to account details", () => {
+      // @See backend
+    });
+  });
+
+  test("Account already created with email", ({ given, when, then, and }) => {
+    given(
+      "a set of users already created accounts",
+      async (table: CreateUserInput[]) => {
+        users = table.map((user) => {
+          return new CreateUserInputBuilder()
+            .withAllRandomDetails()
+            .withEmail(user.email)
+            .withFirstName(user.firstName)
+            .withLastName(user.lastName)
+            .build();
+        });
+        await databaseFixtures.setUpWithExistingUsers(users);
+      }
+    );
+    when("new users attempt to register with those emails", async () => {
+      userInput = new CreateUserInputBuilder()
+        .withAllRandomDetails()
+        .withEmail(users[0].email)
+        .build();
+      await pages.registration.open();
+      await pages.registration.enterFormDetails(userInput);
+      await pages.registration.acceptMarketingEmails();
+      await pages.registration.submitForm();
+    });
+    then(
+      "they should see an error notifying them that the account already exists",
+      async () => {
+        const errorNotification =
+          await app.notifications.getErrorNotificationText();
+        expect(errorNotification).toBeDefined();
+        expect(errorNotification).toContain("already in use");
+      }
+    );
+    and("they should not have been sent access to account details", () => {
+      // @See backend
+    });
+  });
+});

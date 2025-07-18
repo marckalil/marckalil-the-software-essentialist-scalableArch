@@ -1,9 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 
+import { database } from "@dddforum/backend/src/shared/bootstrap";
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
 
 export class DatabaseFixtures {
-  constructor(private connection: PrismaClient) {}
+  private connection: PrismaClient;
+  constructor() {
+    this.connection = database.getConnection();
+  }
 
   public async reset() {
     const deleteAllComments = this.connection.comment.deleteMany();

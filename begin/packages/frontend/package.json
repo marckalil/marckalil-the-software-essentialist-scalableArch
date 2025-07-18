@@ -8,7 +8,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start:dev": "vite",
-    "test:e2e": "echo TEST_E2E_FRONTEND"
+    "test:e2e": "jest -c jest.config.e2e.ts"
   },
   "dependencies": {
     "@dddforum/shared": "file:../shared",
@@ -29,6 +29,7 @@
     "@vitejs/plugin-react": "^4.2.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "puppeteer": "^24.14.0",
     "vite": "^5.0.0"
   }
 }
