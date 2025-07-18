@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
 
 interface RegistrationFormProps {
-  onSubmit: (formDetails: CreateUserInput) => void;
+  onSubmit: (
+    formDetails: CreateUserInput,
+    allowMarketingEmails: boolean
+  ) => void;
 }
 
 export const RegistrationForm = (props: RegistrationFormProps) => {
@@ -12,14 +15,22 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
   const [username, setUsername] = useState("username");
   const [firstName, setFirstName] = useState("firstName");
   const [lastName, setLastName] = useState("lastName");
+  const [allowMarketingEmails, setAllowMarketingEmails] = useState(false);
+
+  const toggleAllowMarketingEmails = () => {
+    setAllowMarketingEmails(!allowMarketingEmails);
+  };
 
   const handleSubmit = () => {
-    props.onSubmit({
-      email,
-      username,
-      firstName,
-      lastName,
-    });
+    props.onSubmit(
+      {
+        email,
+        username,
+        firstName,
+        lastName,
+      },
+      allowMarketingEmails
+    );
   };
 
   return (
@@ -61,6 +72,15 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
         >
           Submit
         </button>
+        <label>
+          <input
+            className="registration marketing-emails"
+            type="checkbox"
+            checked={allowMarketingEmails}
+            onChange={() => toggleAllowMarketingEmails()}
+          />
+          Want to be notified about events & discounts?
+        </label>
       </div>
     </div>
   );
