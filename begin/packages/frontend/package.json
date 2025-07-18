@@ -8,7 +8,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start:dev": "vite",
-    "test:e2e": "echo TEST_E2E_FRONTEND"
+    "test:e2e": "jest -c jest.config.e2e.ts"
   },
   "dependencies": {
     "@dddforum/shared": "file:../shared",
