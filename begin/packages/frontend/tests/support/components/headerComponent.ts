@@ -1,13 +1,21 @@
-import { Component } from "./component";
+import { Component, PageElements } from "./component";
 import { PuppeteerPageDriver } from "../driver";
 
 export class HeaderComponent extends Component {
+  private elements: PageElements;
+
   constructor(driver: PuppeteerPageDriver) {
     super(driver);
+    this.elements = new PageElements(
+      {
+        header: { selector: ".header.username", type: "div" },
+      },
+      driver
+    );
   }
 
-  public async getLoggedInUserName(): Promise<string | undefined> {
-    // TODO: Implement logic to get the logged in user's name from the header
-    return undefined;
+  async getUsernameFromHeader() {
+    const usernameElement = await this.elements.get("header");
+    return usernameElement?.evaluate((e) => e.textContent);
   }
 }
