@@ -32,19 +32,19 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
         onChange={(e) => setEmail(e.target.value)}
       ></input>
       <input
-        className="registatation-input username"
+        className="registration username"
         type="text"
         placeholder="username"
         onChange={(e) => setUsername(e.target.value)}
       ></input>
       <input
-        className="registatation-input username"
+        className="registration first-name"
         type="text"
         placeholder="first name"
         onChange={(e) => setFirstName(e.target.value)}
       ></input>
       <input
-        className="registatation-input username"
+        className="registration last-name"
         type="text"
         placeholder="last name"
         onChange={(e) => setLastName(e.target.value)}
@@ -56,7 +56,7 @@ export const RegistrationForm = (props: RegistrationFormProps) => {
         </div>
         <button
           onClick={() => handleSubmit()}
-          className="submit-button"
+          className="registration submit-button"
           type="submit"
         >
           Submit
