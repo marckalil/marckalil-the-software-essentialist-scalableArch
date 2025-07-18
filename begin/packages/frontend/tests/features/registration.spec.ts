@@ -1,8 +1,14 @@
-import { defineFeature, loadFeature } from "jest-cucumber";
-import { sharedTestRoot } from "@dddforum/shared/src/paths";
 import * as path from "path";
-import { DatabaseFixtures } from "@dddforum/shared/tests/support/fixtures/databaseFixtures";
+
+import { defineFeature, loadFeature } from "jest-cucumber";
+
 import { CreateUserInput } from "@dddforum/shared/src/api/users";
+import { sharedTestRoot } from "@dddforum/shared/src/paths";
+import { CreateUserInputBuilder } from "@dddforum/shared/tests/support/builders/CreateUserInputBuilder";
+import { DatabaseFixtures } from "@dddforum/shared/tests/support/fixtures/databaseFixtures";
+
+import { PuppeteerPageDriver } from "../support/driver";
+import { App, Layout, Pages } from "../support/pages";
 
 const feature = loadFeature(
   path.join(sharedTestRoot, "features/registration.feature"),
@@ -55,7 +61,7 @@ defineFeature(feature, (test) => {
       }
     );
     then("I should be granted access to my account", async () => {
-      const username = await layout.header.getLoggedInUserName();
+      const username = await layout.header.getUsernameFromHeader();
       expect(username).toBeDefined();
       expect(username).toContain(userInput.username);
     });
